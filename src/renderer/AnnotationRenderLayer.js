@@ -11,8 +11,10 @@ const CombinedCamera = window.THREE.CombinedCamera;
 
 /* Render Layer for rendering annotations on the 3D scene */
 export default class AnnotationRenderLayer extends RenderLayer {
-  get vertexShader() {
-    return `
+
+	get vertexShader() {
+
+		return `
       // Lighting
       struct DirLight {
           vec3 color;
@@ -46,10 +48,12 @@ export default class AnnotationRenderLayer extends RenderLayer {
         }
         #endif
       }`;
-  }
 
-  get fragmentShader() {
-    return `
+	}
+
+	get fragmentShader() {
+
+		return `
     varying vec2 vUv;
     varying vec4 worldPos;
     varying vec3 vecNormal;
@@ -87,219 +91,257 @@ export default class AnnotationRenderLayer extends RenderLayer {
       res.rgb *= lightColor;
       gl_FragColor = res;
     }`;
-  }
 
-  get fbxLoader() {
-    if (!this._fbxLoader) {
-      const manager = new THREE.LoadingManager();
-      const fbxManager = new window.THREE.FBXLoader(manager);
+	}
 
-      const onProgress = () => {};
+	get fbxLoader() {
 
-      this._fbxLoader = {
-        load: path =>
-          new Promise((resolve, reject) => {
-            fbxManager.load(path, obj => resolve(obj), onProgress, err => {
-              console.error(err);
-              reject(err);
-            });
-          }),
-      };
-    }
+		if ( ! this._fbxLoader ) {
 
-    return this._fbxLoader;
-  }
+			const manager = new THREE.LoadingManager();
+			const fbxManager = new window.THREE.FBXLoader( manager );
 
-  get genericShaderMat() {
-    if (!this._genericShaderMat) {
-      this._genericShaderMat = new THREE.ShaderMaterial({
-        name: 'Model Shader',
-        uniforms: THREE.UniformsUtils.merge([
-          THREE.UniformsLib.lights,
-          {
-            _Color: { type: 'v4', value: new THREE.Vector4(0.0, 0.0, 0.0, 0.0) },
-            _DepthTexture: { value: new THREE.DepthTexture() },
-            _DepthTexWidth: { type: 'i', value: 0 },
-            _DepthTexHeight: { type: 'i', value: 0 },
-            _DrawThroughAlpha: { type: 'f', value: 0.0 },
-          },
-        ]),
-        vertexShader: this.vertexShader,
-        fragmentShader: this.fragmentShader,
-        transparent: true,
-        lights: true,
-      });
-    }
-    return this._genericShaderMat;
-  }
+			const onProgress = () => {};
 
-  /* Lifecycle Functions */
-  constructor(zindex = 0, name = 'annotation render layer') {
-    super(zindex, name);
+			this._fbxLoader = {
+				load: path =>
+					new Promise( ( resolve, reject ) => {
 
-    //these get poked from session-viewer-app.js
-    this.annotationState = {
-      poi: {
-        hide: true,
-        pos: new THREE.Vector3(),
-        norm: new THREE.Vector3(0, 1, 0),
-      }
-    };
-    this.model = null;
+						fbxManager.load( path, obj => resolve( obj ), onProgress, err => {
 
-    //this gets poked from ps-viewer.js
-    this.modelToWorld = new THREE.Matrix4();
+							console.error( err );
+							reject( err );
 
-    this.workspaceFrame = new THREE.Object3D();
-    this.workspaceFrame.name = 'WorkspaceFrame';
-    this.workspaceFrame.matrixAutoUpdate = false;
+						} );
 
-    this.modelFrame = new THREE.Object3D();
-    this.modelFrame.name = 'ModelFrame';
-    this.modelFrame.matrixAutoUpdate = false;
+					} ),
+			};
 
-    this.scene = new THREE.Scene();
+		}
 
-    this.camera = new CombinedCamera(window.innerWidth, window.innerHeight, 75, 0.1, 1000);
-    this.camera.position.z = 5;
+		return this._fbxLoader;
 
-    this.scene.add(this.camera);
-    this.scene.add(this.workspaceFrame);
-    this.scene.add(this.modelFrame);
+	}
 
-    // render settings
-    this.clearColor = 0x000000;
-    this.clearAlpha = 0;
-    this.targetScale = 1;
-    this.depthTexture = null;
+	get genericShaderMat() {
 
-    // load models
-    this.poiScale = 0.01;
-    this._loadPoiModel();
-    this.animationClock = new THREE.Clock();
-  }
+		if ( ! this._genericShaderMat ) {
 
-  /* Utilities */
-  _recursiveAssignMaterial(mat, node) {
-    if (node.geometry) node.material = mat;
-    node.children.forEach(child => this._recursiveAssignMaterial(mat, child));
-  }
+			this._genericShaderMat = new THREE.ShaderMaterial( {
+				name: 'Model Shader',
+				uniforms: THREE.UniformsUtils.merge( [
+					THREE.UniformsLib.lights,
+					{
+						_Color: { type: 'v4', value: new THREE.Vector4( 0.0, 0.0, 0.0, 0.0 ) },
+						_DepthTexture: { value: new THREE.DepthTexture() },
+						_DepthTexWidth: { type: 'i', value: 0 },
+						_DepthTexHeight: { type: 'i', value: 0 },
+						_DrawThroughAlpha: { type: 'f', value: 0.0 },
+					},
+				] ),
+				vertexShader: this.vertexShader,
+				fragmentShader: this.fragmentShader,
+				transparent: true,
+				lights: true,
+			} );
 
-  /* Private API */
-  _getMaterial(r, g, b, a) {
-    const newMat = this.genericShaderMat.clone();
+		}
 
-    // these values are needed for the visibility culler
-    newMat.uniforms = THREE.UniformsUtils.clone(this.genericShaderMat.uniforms);
-    newMat.uniforms._Color.value = new THREE.Vector4(r, g, b, a);
+		return this._genericShaderMat;
 
-    return newMat;
-  }
+	}
 
-  _loadPoiModel() {
-    this.fbxLoader.load('/models/poi_animated.fbx').then(model => {
-      this.poiObject = model;
-      this.poiObject.add(new THREE.DirectionalLight(0xffffff, 0.75));
-      this.poiMat = this._getMaterial(1, 1, 1, 1.0);
-      this.poiMat.uniforms._DrawThroughAlpha.value = 0.25;
+	/* Lifecycle Functions */
+	constructor( zindex = 0, name = 'annotation render layer' ) {
 
-      this.poiAnimationMixer = new THREE.AnimationMixer(this.poiObject);
+		super( zindex, name );
 
-      const action = this.poiAnimationMixer.clipAction(this.poiObject.animations[0]);
-      action.setDuration(8);
-      action.play();
+		//these get poked from session-viewer-app.js
+		this.annotationState = {
+			poi: {
+				hide: true,
+				pos: new THREE.Vector3(),
+				norm: new THREE.Vector3( 0, 1, 0 ),
+			}
+		};
+		this.model = null;
 
-      this.poiRoot = new THREE.Object3D();
-      this.poiRoot.add(this.poiObject);
-      this.modelFrame.add(this.poiRoot);
+		//this gets poked from ps-viewer.js
+		this.modelToWorld = new THREE.Matrix4();
 
-      this.poiObject.traverse(child => {
-        if (child instanceof THREE.Mesh) child.material = this.poiMat;
-      });
-    });
-  }
+		this.workspaceFrame = new THREE.Object3D();
+		this.workspaceFrame.name = 'WorkspaceFrame';
+		this.workspaceFrame.matrixAutoUpdate = false;
 
-  _updatePoi() {
-    window.annotation = this;
+		this.modelFrame = new THREE.Object3D();
+		this.modelFrame.name = 'ModelFrame';
+		this.modelFrame.matrixAutoUpdate = false;
 
-    if (!this.poiObject || !this.annotationState.poi) return;
+		this.scene = new THREE.Scene();
 
-    const poi = this.annotationState.poi;
+		this.camera = new CombinedCamera( window.innerWidth, window.innerHeight, 75, 0.1, 1000 );
+		this.camera.position.z = 5;
 
-    if (poi.hide) {
-      this.poiObject.visible = false;
-      return;
-    }
+		this.scene.add( this.camera );
+		this.scene.add( this.workspaceFrame );
+		this.scene.add( this.modelFrame );
 
-    this.poiObject.visible = true;
-    this.poiAnimationMixer.update(this.animationClock.getDelta());
+		// render settings
+		this.clearColor = 0x000000;
+		this.clearAlpha = 0;
+		this.targetScale = 1;
+		this.depthTexture = null;
 
-    const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3().copy(poi.norm));
+		// load models
+		this.poiScale = 0.01;
+		this._loadPoiModel();
+		this.animationClock = new THREE.Clock();
 
-    //compensate for model scale so that the POI model always appears the same size on screen
-    //it wouldn't work to just keep modelToWorld scale identity
-    //because we need the model scale factor to apply to the POI position
-    const s = this.poiScale / this.modelToWorld.getMaxScaleOnAxis();
-    this.poiObject.scale.set(s, s, s);
+	}
 
-    if (this.poiRoot.position.equals(poi.pos) && this.poiRoot.quaternion.equals(q)) return;
+	/* Utilities */
+	_recursiveAssignMaterial( mat, node ) {
 
-    this.poiRoot.position.copy(poi.pos);
-    this.poiRoot.quaternion.copy(q);
+		if ( node.geometry ) node.material = mat;
+		node.children.forEach( child => this._recursiveAssignMaterial( mat, child ) );
 
-  }
+	}
 
-  _updateWorkspaceAndModelFrame() {
-    //Note 1: modelFrame is not actually parented to workspaceFrame.
-    //Note 2: the model is rendered separately by ModelRenderLayer which maintains its own version of modelFrame.
+	/* Private API */
+	_getMaterial( r, g, b, a ) {
 
-    this.workspaceFrame.matrix.identity();
-    this.modelFrame.matrix.copy(this.modelToWorld);
+		const newMat = this.genericShaderMat.clone();
 
-    //compute matrixWorld from matrix (matrixAutoUpdate is off)
-    //updateMatrixWorld() is recursive, it operates on the node and all descendants
-    //(so if modelFrame was parented to workspaceFrame then it would only be needed to call this on the latter)
-    //the descendants of workspaceFrame are the floor plane
-    //the only descendant of modelFrame is the POI
-    this.workspaceFrame.updateMatrixWorld(true);
-    this.modelFrame.updateMatrixWorld(true);
-  }
+		// these values are needed for the visibility culler
+		newMat.uniforms = THREE.UniformsUtils.clone( this.genericShaderMat.uniforms );
+		newMat.uniforms._Color.value = new THREE.Vector4( r, g, b, a );
 
-  /* Interface */
-  prerender() {}
+		return newMat;
 
-  postrender() {}
+	}
 
-  needsToDraw() {
-    return true;
-  }
+	_loadPoiModel() {
 
-  render(renderer, target, viewWidth, viewHeight) {
-    target.setSize(viewWidth * this.targetScale, viewHeight * this.targetScale);
+		this.fbxLoader.load( '/models/poi_animated.fbx' ).then( model => {
 
-    // Material Updates
-    const updateMaterial = mat => {
-      mat.uniforms._DepthTexture.value = this.depthTexture;
-      mat.uniforms._DepthTexWidth.value = this.depthTexture.image.width;
-      mat.uniforms._DepthTexHeight.value = this.depthTexture.image.height;
-    };
+			this.poiObject = model;
+			this.poiObject.add( new THREE.DirectionalLight( 0xffffff, 0.75 ) );
+			this.poiMat = this._getMaterial( 1, 1, 1, 1.0 );
+			this.poiMat.uniforms._DrawThroughAlpha.value = 0.25;
 
-    if (this.poiMat) updateMaterial(this.poiMat);
+			this.poiAnimationMixer = new THREE.AnimationMixer( this.poiObject );
 
-    this.prerender(renderer, target, viewWidth, viewHeight);
+			const action = this.poiAnimationMixer.clipAction( this.poiObject.animations[ 0 ] );
+			action.setDuration( 8 );
+			action.play();
 
-    // Camera Updates
-    this.camera.setSize(viewWidth, viewHeight);
+			this.poiRoot = new THREE.Object3D();
+			this.poiRoot.add( this.poiObject );
+			this.modelFrame.add( this.poiRoot );
 
-    // Transform Updates
-    this._updateWorkspaceAndModelFrame();
-    this._updatePoi();
+			this.poiObject.traverse( child => {
 
-    // Rendering
-    renderer.setClearColor(this.clearColor, this.clearAlpha);
-    renderer.clearTarget(target, true, true, true);
-    renderer.render(this.scene, this.camera, target);
+				if ( child instanceof THREE.Mesh ) child.material = this.poiMat;
 
-    this.postrender(renderer, target, viewWidth, viewHeight);
-  }
+			} );
+
+		} );
+
+	}
+
+	_updatePoi() {
+
+		window.annotation = this;
+
+		if ( ! this.poiObject || ! this.annotationState.poi ) return;
+
+		const poi = this.annotationState.poi;
+
+		if ( poi.hide ) {
+
+			this.poiObject.visible = false;
+			return;
+
+		}
+
+		this.poiObject.visible = true;
+		this.poiAnimationMixer.update( this.animationClock.getDelta() );
+
+		const q = new THREE.Quaternion().setFromUnitVectors( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3().copy( poi.norm ) );
+
+		//compensate for model scale so that the POI model always appears the same size on screen
+		//it wouldn't work to just keep modelToWorld scale identity
+		//because we need the model scale factor to apply to the POI position
+		const s = this.poiScale / this.modelToWorld.getMaxScaleOnAxis();
+		this.poiObject.scale.set( s, s, s );
+
+		if ( this.poiRoot.position.equals( poi.pos ) && this.poiRoot.quaternion.equals( q ) ) return;
+
+		this.poiRoot.position.copy( poi.pos );
+		this.poiRoot.quaternion.copy( q );
+
+	}
+
+	_updateWorkspaceAndModelFrame() {
+
+		//Note 1: modelFrame is not actually parented to workspaceFrame.
+		//Note 2: the model is rendered separately by ModelRenderLayer which maintains its own version of modelFrame.
+
+		this.workspaceFrame.matrix.identity();
+		this.modelFrame.matrix.copy( this.modelToWorld );
+
+		//compute matrixWorld from matrix (matrixAutoUpdate is off)
+		//updateMatrixWorld() is recursive, it operates on the node and all descendants
+		//(so if modelFrame was parented to workspaceFrame then it would only be needed to call this on the latter)
+		//the descendants of workspaceFrame are the floor plane
+		//the only descendant of modelFrame is the POI
+		this.workspaceFrame.updateMatrixWorld( true );
+		this.modelFrame.updateMatrixWorld( true );
+
+	}
+
+	/* Interface */
+	prerender() {}
+
+	postrender() {}
+
+	needsToDraw() {
+
+		return true;
+
+	}
+
+	render( renderer, target, viewWidth, viewHeight ) {
+
+		target.setSize( viewWidth * this.targetScale, viewHeight * this.targetScale );
+
+		// Material Updates
+		const updateMaterial = mat => {
+
+			mat.uniforms._DepthTexture.value = this.depthTexture;
+			mat.uniforms._DepthTexWidth.value = this.depthTexture.image.width;
+			mat.uniforms._DepthTexHeight.value = this.depthTexture.image.height;
+
+		};
+
+		if ( this.poiMat ) updateMaterial( this.poiMat );
+
+		this.prerender( renderer, target, viewWidth, viewHeight );
+
+		// Camera Updates
+		this.camera.setSize( viewWidth, viewHeight );
+
+		// Transform Updates
+		this._updateWorkspaceAndModelFrame();
+		this._updatePoi();
+
+		// Rendering
+		renderer.setClearColor( this.clearColor, this.clearAlpha );
+		renderer.clearTarget( target, true, true, true );
+		renderer.render( this.scene, this.camera, target );
+
+		this.postrender( renderer, target, viewWidth, viewHeight );
+
+	}
+
 }

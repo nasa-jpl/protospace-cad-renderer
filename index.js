@@ -8,279 +8,336 @@ import AnnotationLayer from './src/renderer/AnnotationRenderLayer.js';
 import TrackballControls from './src/lib/TrackballControls.module.js';
 import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
 
-function writeOutput(msg) {
-  document.getElementById('output').innerText = msg;
+function writeOutput( msg ) {
+
+	document.getElementById( 'output' ).innerText = msg;
+
 }
 
-const params = new URLSearchParams(window.location.search);
-const lod = params.get('lod') === null ? 2 : parseInt(params.get('lod'));
+const params = new URLSearchParams( window.location.search );
+const lod = params.get( 'lod' ) === null ? 2 : parseInt( params.get( 'lod' ) );
 const urlStem = './models/m2020-rover/';
 const hierarchyUrl = urlStem + 'hierarchy.json';
 const metadataUrl = urlStem + 'metadata.json';
 const meshStatsUrl = urlStem + 'mesh_stats.json';
 
-(async function() {
+( async function () {
 
-  let loaded = new Array(3).fill(0);
-  let totals = new Array(3).fill(0);
-  function updateProgressDisplay() {
-    if (totals.includes(0)) return;
+	let loaded = new Array( 3 ).fill( 0 );
+	let totals = new Array( 3 ).fill( 0 );
+	function updateProgressDisplay() {
 
-    let totalValue = 0;
-    let loadedValue = 0;
-    for (let i = 0; i < 3; i++) {
-      loadedValue += loaded[i];
-      totalValue += totals[i];
-    }
-    
-    let perc = loadedValue / totalValue;
-    writeOutput(`Loading model metadata... ${ (perc * 100).toFixed(2) }%`);
+		if ( totals.includes( 0 ) ) return;
 
-  }
+		let totalValue = 0;
+		let loadedValue = 0;
+		for ( let i = 0; i < 3; i ++ ) {
 
+			loadedValue += loaded[ i ];
+			totalValue += totals[ i ];
 
-  writeOutput('Loading model metadata...');
-  const [hierarchy, metadata, meshStats] = await Promise.all([
-    fetchWithProgress(hierarchyUrl, (l, t) => {
-      loaded[0] = l;
-      totals[0] = t;
-      updateProgressDisplay();
-    }).then(res => res.json()),
-    fetchWithProgress(metadataUrl, (l, t) => {
-      loaded[1] = l;
-      totals[1] = t;
-      updateProgressDisplay();
-    }).then(res => res.json()),
-    fetchWithProgress(meshStatsUrl, (l, t) => {
-      loaded[2] = l;
-      totals[2] = t;
-      updateProgressDisplay();
-    }).then(res => res.json()),
-  ]);
+		}
 
-  metadata.name = '';
+		let perc = loadedValue / totalValue;
+		writeOutput( `Loading model metadata... ${ ( perc * 100 ).toFixed( 2 ) }%` );
 
-  writeOutput('Downloading model archive...');
-  const model = new Model(hierarchy, metadata, meshStats, urlStem, { minLod: lod });
-  const animationPlayer = new AnimationPlayer(model);
-
-  // if (model.preprocessDone) {
-  //     writeOutput('');
-  // } else {
-  //   model.listen('preprocessing', e => {
-  //     writeOutput(`${e.detail.count} nodes processed`);
-  //   });
-  //   model.listen('preprocess-complete', writeOutput(''));
-  // }
-
-  model.listen('node-geometry-loaded', e => {
-    const { totalLoads, remainingLoads } = e.detail;
-    const loaded = totalLoads - remainingLoads;
-    writeOutput(`${loaded} / ${totalLoads} meshes processed...`);
-  });
-  model.listen('geometry-load-complete', e => {
-    writeOutput('');
-  });
+	}
 
 
-  // create the renderer
-  const backgroundColor = 0x151515;
-  const renderer = new LayeredRenderer(backgroundColor);
-  const element = renderer.domElement;
-  renderer.antialiasing = 2;
-  renderer.accountForDPI = true;
-  renderer.prerender = function(width, height) {
+	writeOutput( 'Loading model metadata...' );
+	const [ hierarchy, metadata, meshStats ] = await Promise.all( [
+		fetchWithProgress( hierarchyUrl, ( l, t ) => {
 
-    if (model.geometryLoaded) {
-      const colorRendering = colorLayer.needsToDraw() && colorLayer.isVisible();
-      const highlightRendering = highlightLayer.needsToDraw() && highlightLayer.isVisible();
-      if (colorRendering || highlightRendering) {
-        writeOutput('rendering...');
-      } else {
-        writeOutput('');
-      }
-    }
+			loaded[ 0 ] = l;
+			totals[ 0 ] = t;
+			updateProgressDisplay();
 
-    // TODO: do this in a resize event
-    colorLayer.camera.setSize(width, height);
-    colorLayer.camera.updateMatrixWorld(true);
-    colorLayer.camera.updateProjectionMatrix();
-    controls.handleResize();
-    controls.update();
+		} ).then( res => res.json() ),
+		fetchWithProgress( metadataUrl, ( l, t ) => {
 
-    if (model && !model.geometryLoaded) {
-      colorLayer.redraw();
-      highlightLayer.redraw();
-    }
+			loaded[ 1 ] = l;
+			totals[ 1 ] = t;
+			updateProgressDisplay();
 
-  };
+		} ).then( res => res.json() ),
+		fetchWithProgress( meshStatsUrl, ( l, t ) => {
 
-  window.renderer = renderer;
+			loaded[ 2 ] = l;
+			totals[ 2 ] = t;
+			updateProgressDisplay();
 
-  document.body.appendChild(element);
-  element.style.width = '100%';
-  element.style.height = '100%';
+		} ).then( res => res.json() ),
+	] );
 
-  const modelToWorld = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
+	metadata.name = '';
 
-  // TODO: move config to a constructor interface or just fields
-  // instead of referencing it in the file
-  // create the layers
-  const colorLayer = new ModelRenderLayer(model, 0, 'color');
-  colorLayer.modelToWorld.copy(modelToWorld);
+	writeOutput( 'Downloading model archive...' );
+	const model = new Model( hierarchy, metadata, meshStats, urlStem, { minLod: lod } );
+	const animationPlayer = new AnimationPlayer( model );
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.position.set(1, 1, 1);
-  directionalLight.updateMatrixWorld();
+	// if (model.preprocessDone) {
+	//     writeOutput('');
+	// } else {
+	//   model.listen('preprocessing', e => {
+	//     writeOutput(`${e.detail.count} nodes processed`);
+	//   });
+	//   model.listen('preprocess-complete', writeOutput(''));
+	// }
 
-  const controls = new TrackballControls(colorLayer.camera, element);
-  controls.rotateSpeed = 10.0;
-  controls.zoomSpeed = 5;
-  controls.panSpeed = 2;
-  controls.noZoom = false;
-  controls.noPan = false;
-  controls.staticMoving = true;
-  controls.dynamicDampingFactor = 0.3;
-  controls.maxDistance = 50;
-  controls.minDistance = 0.25;
-  controls.addEventListener('change', () => {
-    colorLayer.redraw();
-    highlightLayer.redraw();
-  });
+	model.listen( 'node-geometry-loaded', e => {
 
-  colorLayer.scene.add(ambientLight);
-  colorLayer.scene.add(directionalLight);
-  colorLayer.depthTexture = new THREE.DepthTexture();
-  colorLayer.depthTexture.type = THREE.UnsignedIntType;
-  // colorLayer.triangleLimit = config.renderer.triangleBatchLimit;
-  // colorLayer.geometryLimit = config.renderer.geometryBatchLimit;
-  // colorLayer.clipPlane = this.clipPlane;
+		const { totalLoads, remainingLoads } = e.detail;
+		const loaded = totalLoads - remainingLoads;
+		writeOutput( `${loaded} / ${totalLoads} meshes processed...` );
 
-  colorLayer.isVisible = () => model && model.geometryLoaded;
-  renderer.addLayer(colorLayer);
+	} );
+	model.listen( 'geometry-load-complete', e => {
 
-  const highlightLayer = new ModelRenderLayer(model, 1, 'highlight');
-  highlightLayer.modelToWorld.copy(modelToWorld);
-  highlightLayer.clearColor = backgroundColor;
-  highlightLayer.clearAlpha = 0.5;
-  highlightLayer.camera = colorLayer.camera;
-  // highlightLayer.triangleLimit = config.renderer.triangleBatchLimit;
-  // highlightLayer.geometryLimit = config.renderer.geometryBatchLimit;
-  // highlightLayer.clipPlane = this.clipPlane;
+		writeOutput( '' );
+
+	} );
 
 
-  let selectedMap = {};
-  let fullSelectedMap = {};
-  let getSelectedNode = () => null;
-  function setSelectionMap(map) {
-    selectedMap = map;
-    fullSelectedMap = model.mapToFullMap(selectedMap);
+	// create the renderer
+	const backgroundColor = 0x151515;
+	const renderer = new LayeredRenderer( backgroundColor );
+	const element = renderer.domElement;
+	renderer.antialiasing = 2;
+	renderer.accountForDPI = true;
+	renderer.prerender = function ( width, height ) {
 
-    const nodes = model.sortedGeometryNodes;
-    const ids = [];
-    const task = (function* () {
-      // return the non-visible nodes first so the highlight for the visible nodes is more prominent
-      for (const n of nodes) {
-        if ((!n.cached.enabledInTree || !n.cached.visibleInTree) && fullSelectedMap[n.id]) {
-          ids.push(n);
-          yield null;
-        }
-      }
-      for (const n of nodes) {
-        if (n.cached.enabledInTree && n.cached.visibleInTree && fullSelectedMap[n.id]) {
-          ids.push(n);
-          yield null;
-        }
-      }
-    })();
+		if ( model.geometryLoaded ) {
 
-    let done = false;
-    getSelectedNode = i => {
-      while (!done && i >= ids.length) done = task.next().done;
-      return ids[i];
-    };
+			const colorRendering = colorLayer.needsToDraw() && colorLayer.isVisible();
+			const highlightRendering = highlightLayer.needsToDraw() && highlightLayer.isVisible();
+			if ( colorRendering || highlightRendering ) {
 
-    highlightLayer.redraw();
+				writeOutput( 'rendering...' );
 
-  }
-  model.listen('preprocess-complete', () => setSelectionMap(selectedMap));
+			} else {
 
-  const lightMat = new THREE.MeshBasicMaterial({ wireframe: true, color: 'rgb(65%, 75%, 70%)', opacity: 0.1, transparent: true, depthTest: false });
-  const highlightMat = new THREE.MeshBasicMaterial({ wireframe: true, color: 'rgb(0%, 100%, 50%)', opacity: 0.1, transparent: true, depthTest: false });
-  highlightLayer.getMaterial = n => (!n.cached.enabledInTree || !n.cached.visibleInTree ? lightMat : highlightMat);
-  highlightLayer.getNodeToRender = (model, i) => getSelectedNode(i);
-  highlightLayer.isVisible = () => {
-    //see comment above for this._layers.color.isVisible
-    if (!model || !model.geometryLoaded) return false;
+				writeOutput( '' );
 
-    const isHighlighting = fullSelectedMap && Object.keys(fullSelectedMap).length > 0;
+			}
 
-    return isHighlighting;
-  };
+		}
 
-  renderer.addLayer(highlightLayer);
+		// TODO: do this in a resize event
+		colorLayer.camera.setSize( width, height );
+		colorLayer.camera.updateMatrixWorld( true );
+		colorLayer.camera.updateProjectionMatrix();
+		controls.handleResize();
+		controls.update();
 
-  const annotationLayer = new AnnotationLayer(2, 'annotations');
-  annotationLayer.prerender = () => annotationLayer.depthTexture = colorLayer.depthTexture;
-  annotationLayer.scene.add(new THREE.AmbientLight(0xffffff));
-  annotationLayer.camera = colorLayer.camera;
-  annotationLayer.model = model;
-  renderer.addLayer(annotationLayer);
+		if ( model && ! model.geometryLoaded ) {
 
-  // Click Events
-  // keep track of whether or not the mouse moved
-  // from mouse down to mouse up and don't fire a
-  // raycast if it did to avoid accidental clicks
-  // when rotation
-  let downPos = { x: 0, y: 0 };
-  let moved = false;
+			colorLayer.redraw();
+			highlightLayer.redraw();
 
-  const getRaycast = e => {
-    const xnorm = (e.offsetX / element.offsetWidth) * 2 - 1;
-    const ynorm = -(e.offsetY / element.offsetHeight) * 2 + 1;
-    const mouse = new THREE.Vector2(xnorm, ynorm);
+		}
 
-    return ModelCaster.raycast(model, colorLayer.camera, mouse, colorLayer.modelToWorld);
-  };
+	};
 
-  element.addEventListener('mousedown', e => {
-    downPos = { x: e.pageX, y: e.pageY };
-    moved = false;
-  });
+	window.renderer = renderer;
 
-  element.addEventListener('mousemove', e => {
-    // mouse move was getting called on some machines
-    // even though it didn't seem like it should, so
-    // we check this more explicitly
-    moved = moved || (downPos.x !== e.pageX && downPos.y !== e.pageY);
-  });
+	document.body.appendChild( element );
+	element.style.width = '100%';
+	element.style.height = '100%';
 
-  element.addEventListener('mouseup', e => {
-    if (e.which !== 1 && e.which !== 3 || !model.preprocessDone) return;
+	const modelToWorld = new THREE.Matrix4().makeRotationFromEuler( new THREE.Euler( Math.PI / 2, 0, 0 ) );
 
-    // If the mouse moved before being released, then don't
-    // cast a ray. Otherwise we will register a click while the
-    // user is using the trackball controls
-    if (moved) return;
+	// TODO: move config to a constructor interface or just fields
+	// instead of referencing it in the file
+	// create the layers
+	const colorLayer = new ModelRenderLayer( model, 0, 'color' );
+	colorLayer.modelToWorld.copy( modelToWorld );
 
-    e.preventDefault();
+	const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+	const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	directionalLight.position.set( 1, 1, 1 );
+	directionalLight.updateMatrixWorld();
 
-    const { hitNode, hitMesh, hitPoint, hitNormal } = getRaycast(e);
+	const controls = new TrackballControls( colorLayer.camera, element );
+	controls.rotateSpeed = 10.0;
+	controls.zoomSpeed = 5;
+	controls.panSpeed = 2;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.maxDistance = 50;
+	controls.minDistance = 0.25;
+	controls.addEventListener( 'change', () => {
 
-    if (e.which === 1) {
-      if (hitNode) setSelectionMap({ [hitNode.id]: true });
-      else setSelectionMap({});
-    } else if (e.which === 3) {
-      if (hitPoint) {
-        annotationLayer.annotationState.poi.norm.copy(hitNormal);
-        annotationLayer.annotationState.poi.pos.copy(hitPoint);
-        annotationLayer.annotationState.poi.hide = false;
-      } else {
-        annotationLayer.annotationState.poi.hide = true;
-      }
-    }
+		colorLayer.redraw();
+		highlightLayer.redraw();
 
-  });
+	} );
 
-})();
+	colorLayer.scene.add( ambientLight );
+	colorLayer.scene.add( directionalLight );
+	colorLayer.depthTexture = new THREE.DepthTexture();
+	colorLayer.depthTexture.type = THREE.UnsignedIntType;
+	// colorLayer.triangleLimit = config.renderer.triangleBatchLimit;
+	// colorLayer.geometryLimit = config.renderer.geometryBatchLimit;
+	// colorLayer.clipPlane = this.clipPlane;
+
+	colorLayer.isVisible = () => model && model.geometryLoaded;
+	renderer.addLayer( colorLayer );
+
+	const highlightLayer = new ModelRenderLayer( model, 1, 'highlight' );
+	highlightLayer.modelToWorld.copy( modelToWorld );
+	highlightLayer.clearColor = backgroundColor;
+	highlightLayer.clearAlpha = 0.5;
+	highlightLayer.camera = colorLayer.camera;
+	// highlightLayer.triangleLimit = config.renderer.triangleBatchLimit;
+	// highlightLayer.geometryLimit = config.renderer.geometryBatchLimit;
+	// highlightLayer.clipPlane = this.clipPlane;
+
+
+	let selectedMap = {};
+	let fullSelectedMap = {};
+	let getSelectedNode = () => null;
+	function setSelectionMap( map ) {
+
+		selectedMap = map;
+		fullSelectedMap = model.mapToFullMap( selectedMap );
+
+		const nodes = model.sortedGeometryNodes;
+		const ids = [];
+		const task = ( function* () {
+
+			// return the non-visible nodes first so the highlight for the visible nodes is more prominent
+			for ( const n of nodes ) {
+
+				if ( ( ! n.cached.enabledInTree || ! n.cached.visibleInTree ) && fullSelectedMap[ n.id ] ) {
+
+					ids.push( n );
+					yield null;
+
+				}
+
+			}
+
+			for ( const n of nodes ) {
+
+				if ( n.cached.enabledInTree && n.cached.visibleInTree && fullSelectedMap[ n.id ] ) {
+
+					ids.push( n );
+					yield null;
+
+				}
+
+			}
+
+		} )();
+
+		let done = false;
+		getSelectedNode = i => {
+
+			while ( ! done && i >= ids.length ) done = task.next().done;
+			return ids[ i ];
+
+		};
+
+		highlightLayer.redraw();
+
+	}
+
+	model.listen( 'preprocess-complete', () => setSelectionMap( selectedMap ) );
+
+	const lightMat = new THREE.MeshBasicMaterial( { wireframe: true, color: 'rgb(65%, 75%, 70%)', opacity: 0.1, transparent: true, depthTest: false } );
+	const highlightMat = new THREE.MeshBasicMaterial( { wireframe: true, color: 'rgb(0%, 100%, 50%)', opacity: 0.1, transparent: true, depthTest: false } );
+	highlightLayer.getMaterial = n => ( ! n.cached.enabledInTree || ! n.cached.visibleInTree ? lightMat : highlightMat );
+	highlightLayer.getNodeToRender = ( model, i ) => getSelectedNode( i );
+	highlightLayer.isVisible = () => {
+
+		//see comment above for this._layers.color.isVisible
+		if ( ! model || ! model.geometryLoaded ) return false;
+
+		const isHighlighting = fullSelectedMap && Object.keys( fullSelectedMap ).length > 0;
+
+		return isHighlighting;
+
+	};
+
+	renderer.addLayer( highlightLayer );
+
+	const annotationLayer = new AnnotationLayer( 2, 'annotations' );
+	annotationLayer.prerender = () => annotationLayer.depthTexture = colorLayer.depthTexture;
+	annotationLayer.scene.add( new THREE.AmbientLight( 0xffffff ) );
+	annotationLayer.camera = colorLayer.camera;
+	annotationLayer.model = model;
+	renderer.addLayer( annotationLayer );
+
+	// Click Events
+	// keep track of whether or not the mouse moved
+	// from mouse down to mouse up and don't fire a
+	// raycast if it did to avoid accidental clicks
+	// when rotation
+	let downPos = { x: 0, y: 0 };
+	let moved = false;
+
+	const getRaycast = e => {
+
+		const xnorm = ( e.offsetX / element.offsetWidth ) * 2 - 1;
+		const ynorm = - ( e.offsetY / element.offsetHeight ) * 2 + 1;
+		const mouse = new THREE.Vector2( xnorm, ynorm );
+
+		return ModelCaster.raycast( model, colorLayer.camera, mouse, colorLayer.modelToWorld );
+
+	};
+
+	element.addEventListener( 'mousedown', e => {
+
+		downPos = { x: e.pageX, y: e.pageY };
+		moved = false;
+
+	} );
+
+	element.addEventListener( 'mousemove', e => {
+
+		// mouse move was getting called on some machines
+		// even though it didn't seem like it should, so
+		// we check this more explicitly
+		moved = moved || ( downPos.x !== e.pageX && downPos.y !== e.pageY );
+
+	} );
+
+	element.addEventListener( 'mouseup', e => {
+
+		if ( e.which !== 1 && e.which !== 3 || ! model.preprocessDone ) return;
+
+		// If the mouse moved before being released, then don't
+		// cast a ray. Otherwise we will register a click while the
+		// user is using the trackball controls
+		if ( moved ) return;
+
+		e.preventDefault();
+
+		const { hitNode, hitMesh, hitPoint, hitNormal } = getRaycast( e );
+
+		if ( e.which === 1 ) {
+
+			if ( hitNode ) setSelectionMap( { [ hitNode.id ]: true } );
+			else setSelectionMap( {} );
+
+		} else if ( e.which === 3 ) {
+
+			if ( hitPoint ) {
+
+				annotationLayer.annotationState.poi.norm.copy( hitNormal );
+				annotationLayer.annotationState.poi.pos.copy( hitPoint );
+				annotationLayer.annotationState.poi.hide = false;
+
+			} else {
+
+				annotationLayer.annotationState.poi.hide = true;
+
+			}
+
+		}
+
+	} );
+
+} )();

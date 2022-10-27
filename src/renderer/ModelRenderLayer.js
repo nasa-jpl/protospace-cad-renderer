@@ -11,190 +11,224 @@ const CombinedCamera = window.THREE.CombinedCamera;
 
 /* Render Layer for rending models nodes over multiple frames */
 export default class ModelRenderLayer extends RenderLayer {
-  *_taskFunction() {
-    let rendered = 0;
-    let renderedTriangles = 0;
 
-    const addPooledMesh = (mi, geom, mat) => {
-      if (mat && mat.uniforms && mat.uniforms.PS_M_CLIP) {
-        if (this.clipPlane) {
-          const { point, normal } = this.clipPlane;
-          mat.uniforms._PSClipPlanePosition.value = point;
-          mat.uniforms._PSClipPlaneNormal.value = normal;
-          mat.uniforms.PS_M_CLIP.value = true;
-        } else {
-          mat.uniforms.PS_M_CLIP.value = false;
-        }
-      }
+	*_taskFunction() {
 
-      const mesh = MeshPool.allocate();
-      mesh.geometry = geom;
-      mesh.material = mat;
-      mesh.matrix = mi.cached.meshToModel;
-      mesh.visible = true;
-      mesh.renderOrder = mat.depthOnly ? 0 : 1;
+		let rendered = 0;
+		let renderedTriangles = 0;
 
-      // disable frustum culling on the object to avoid the
-      // small amount of overhead incurred
-      // TODO: is this really a good idea?
-      mesh.frustumCulled = false;
+		const addPooledMesh = ( mi, geom, mat ) => {
 
-      this.modelFrame.add(mesh);
-      mesh.updateMatrixWorld(true);
-    };
+			if ( mat && mat.uniforms && mat.uniforms.PS_M_CLIP ) {
 
-    let i = 0;
-    while (true) {
-      const n = this.getNodeToRender(this.model, i++);
-      if (!n) break;
-      if (!n.geometry || !n.geometry.length) continue;
+				if ( this.clipPlane ) {
 
-      if (n.cached.transformDirty) this.model.refreshTransforms(n.id, false);
+					const { point, normal } = this.clipPlane;
+					mat.uniforms._PSClipPlanePosition.value = point;
+					mat.uniforms._PSClipPlaneNormal.value = normal;
+					mat.uniforms.PS_M_CLIP.value = true;
 
-      for (let g = 0; g < n.geometry.length; g++) {
-        const mi = n.geometry[g];
-        if (!mi.cached.triangles || !mi.cached.threejsGeometry) continue;
+				} else {
 
-        const geom = mi.cached.threejsGeometry;
-        const mat = this.getMaterial(n, mi);
+					mat.uniforms.PS_M_CLIP.value = false;
 
-        if (Array.isArray(mat)) mat.forEach(m => addPooledMesh(mi, geom, m));
-        else addPooledMesh(mi, geom, mat);
+				}
 
-        // TODO: This will cause a flicker on load because every time
-        // we start again, there will be new geometry available which
-        // means we won't get as far into the array the next round
-        rendered++;
-        renderedTriangles += mi.cached.triangles;
+			}
 
-        if (renderedTriangles >= this.triangleLimit || rendered >= this.geometryLimit) {
-          yield null;
-          rendered = 0;
-          renderedTriangles = 0;
-        }
-      }
-    }
-  }
+			const mesh = MeshPool.allocate();
+			mesh.geometry = geom;
+			mesh.material = mat;
+			mesh.matrix = mi.cached.meshToModel;
+			mesh.visible = true;
+			mesh.renderOrder = mat.depthOnly ? 0 : 1;
 
-  /* Lifecycle Functions */
-  constructor(model, zindex = 0, name = 'model render layer') {
-    super(zindex, name);
-    this._task = null;
-    this._renderComplete = false;
+			// disable frustum culling on the object to avoid the
+			// small amount of overhead incurred
+			// TODO: is this really a good idea?
+			mesh.frustumCulled = false;
 
-    // render settings
-    this.clearColor = 0x000000;
-    this.clearAlpha = 0;
-    this.targetScale = 1;
-    this.depthTexture = null;
-    this.triangleLimit = 250000; // how many triangles to render
-    this.geometryLimit = 1000; // how many meshes to render
-    this.clipPlane = null; //this gets poked by ps-viewer.js
+			this.modelFrame.add( mesh );
+			mesh.updateMatrixWorld( true );
 
-    this.model = model;
-    this.modelToWorld = new THREE.Matrix4(); //this gets poked by ps-viewer.js
+		};
 
-    // scene setup
-    this.modelFrame = new THREE.Object3D();
-    this.modelFrame.matrixAutoUpdate = false;
+		let i = 0;
+		while ( true ) {
 
-    // disabling the scene autoUpdate can cause a render
-    // to take an extra millisecond. However, disabling it
-    // means that the camera doesn't get auto-updated, so we
-    // update it manually below
-    this.scene = new THREE.Scene();
-    this.scene.autoUpdate = false;
+			const n = this.getNodeToRender( this.model, i ++ );
+			if ( ! n ) break;
+			if ( ! n.geometry || ! n.geometry.length ) continue;
 
-    this.camera = new CombinedCamera(window.innerWidth, window.innerHeight, 75, 0.1, 1000);
-    this.camera.position.z = 5;
+			if ( n.cached.transformDirty ) this.model.refreshTransforms( n.id, false );
 
-    this.scene.add(this.camera);
-    this.scene.add(this.modelFrame);
-  }
+			for ( let g = 0; g < n.geometry.length; g ++ ) {
 
-  /* Public API */
-  redraw() {
-    this._task = null;
-    this._renderComplete = false;
-  }
+				const mi = n.geometry[ g ];
+				if ( ! mi.cached.triangles || ! mi.cached.threejsGeometry ) continue;
 
-  /* Interface */
-  getMaterial(n, mi) {
-    //in the case of a double sided mesh we actually render it twice, once for each side
-    //because that way our shader uses the correct normal direction for each side
-    const mat = mi.cached.threejsMaterial;
-    if (mat.side !== THREE.DoubleSide) return mat;
-    return [
-      MeshLoader.getMaterialVariant(mat, { side: THREE.FrontSide }),
-      MeshLoader.getMaterialVariant(mat, { side: THREE.BackSide }),
-    ];
-  }
+				const geom = mi.cached.threejsGeometry;
+				const mat = this.getMaterial( n, mi );
 
-  // this is an overrideable hook to accomodate lists of nodes
-  // that are generated as-needed, as in the case with highlighted nodes.
-  getNodeToRender(model, i) {
-    return model.sortedVisibleNodes[i];
-  }
+				if ( Array.isArray( mat ) ) mat.forEach( m => addPooledMesh( mi, geom, m ) );
+				else addPooledMesh( mi, geom, mat );
 
-  prerender() {}
+				// TODO: This will cause a flicker on load because every time
+				// we start again, there will be new geometry available which
+				// means we won't get as far into the array the next round
+				rendered ++;
+				renderedTriangles += mi.cached.triangles;
 
-  postrender() {}
+				if ( renderedTriangles >= this.triangleLimit || rendered >= this.geometryLimit ) {
 
-  needsToDraw() {
-    return this._task === null || !this._renderComplete;
-  }
+					yield null;
+					rendered = 0;
+					renderedTriangles = 0;
 
-  render(renderer, target, viewWidth, viewHeight) {
-    target.setSize(viewWidth * this.targetScale, viewHeight * this.targetScale);
-    target.depthTexture = this.depthTexture;
+				}
 
-    this.prerender(renderer, target, viewWidth, viewHeight);
+			}
 
-    // Update the camera and matrix manually because we
-    // disable the scene autoUpdate above
-    this.camera.setSize(viewWidth, viewHeight);
-    this.camera.updateProjectionMatrix();
-    this.camera.updateMatrixWorld(true);
+		}
 
-    this.modelFrame.matrix.copy(this.modelToWorld);
-    this.modelFrame.updateMatrixWorld(true);
+	}
 
-    renderer.autoClear = false;
+	/* Lifecycle Functions */
+	constructor( model, zindex = 0, name = 'model render layer' ) {
 
-    // If the task doesn't exist, then restart it
-    if (this._task === null) {
-      this._task = this._taskFunction();
+		super( zindex, name );
+		this._task = null;
+		this._renderComplete = false;
 
-      // Clear the target if this is the first render
-      // and we're restarting the task
-      renderer.autoClear = true;
-      renderer.setClearColor(this.clearColor, this.clearAlpha);
-      renderer.clearTarget(target, true, true, true);
-    }
+		// render settings
+		this.clearColor = 0x000000;
+		this.clearAlpha = 0;
+		this.targetScale = 1;
+		this.depthTexture = null;
+		this.triangleLimit = 250000; // how many triangles to render
+		this.geometryLimit = 1000; // how many meshes to render
+		this.clipPlane = null; //this gets poked by ps-viewer.js
 
-    //the model geometries are already sorted such that
-    //* depth-only nodes come first
-    //* transparent nodes come last
-    //* larger nodes come before smaller
-    //TODO if we're using alpha blended transparency
-    //i.e. if (a) there are any transparent nodes and (b) !config.renderer.useDitheredTransparency
-    //then those should be dynamically sorted back to front according to the current viewpoint
-    this.sortedRender = false;
-    const res = this._task.next();
-    this._renderComplete = res.done;
+		this.model = model;
+		this.modelToWorld = new THREE.Matrix4(); //this gets poked by ps-viewer.js
 
-    renderer.sortObjects = this.sortedRender;
-    this.camera.setSize(target.width, target.height);
-    renderer.sortObjects = true; //restore default
+		// scene setup
+		this.modelFrame = new THREE.Object3D();
+		this.modelFrame.matrixAutoUpdate = false;
 
-    renderer.render(this.scene, this.camera, target);
+		// disabling the scene autoUpdate can cause a render
+		// to take an extra millisecond. However, disabling it
+		// means that the camera doesn't get auto-updated, so we
+		// update it manually below
+		this.scene = new THREE.Scene();
+		this.scene.autoUpdate = false;
 
-    MeshPool.releaseAll(m => {
-      m.frustumCulled = true;
-    });
+		this.camera = new CombinedCamera( window.innerWidth, window.innerHeight, 75, 0.1, 1000 );
+		this.camera.position.z = 5;
 
-    this.postrender(renderer, target, viewWidth, viewHeight);
+		this.scene.add( this.camera );
+		this.scene.add( this.modelFrame );
 
-    target.depthTexture = null;
-  }
+	}
+
+	/* Public API */
+	redraw() {
+
+		this._task = null;
+		this._renderComplete = false;
+
+	}
+
+	/* Interface */
+	getMaterial( n, mi ) {
+
+		//in the case of a double sided mesh we actually render it twice, once for each side
+		//because that way our shader uses the correct normal direction for each side
+		const mat = mi.cached.threejsMaterial;
+		if ( mat.side !== THREE.DoubleSide ) return mat;
+		return [
+			MeshLoader.getMaterialVariant( mat, { side: THREE.FrontSide } ),
+			MeshLoader.getMaterialVariant( mat, { side: THREE.BackSide } ),
+		];
+
+	}
+
+	// this is an overrideable hook to accomodate lists of nodes
+	// that are generated as-needed, as in the case with highlighted nodes.
+	getNodeToRender( model, i ) {
+
+		return model.sortedVisibleNodes[ i ];
+
+	}
+
+	prerender() {}
+
+	postrender() {}
+
+	needsToDraw() {
+
+		return this._task === null || ! this._renderComplete;
+
+	}
+
+	render( renderer, target, viewWidth, viewHeight ) {
+
+		target.setSize( viewWidth * this.targetScale, viewHeight * this.targetScale );
+		target.depthTexture = this.depthTexture;
+
+		this.prerender( renderer, target, viewWidth, viewHeight );
+
+		// Update the camera and matrix manually because we
+		// disable the scene autoUpdate above
+		this.camera.setSize( viewWidth, viewHeight );
+		this.camera.updateProjectionMatrix();
+		this.camera.updateMatrixWorld( true );
+
+		this.modelFrame.matrix.copy( this.modelToWorld );
+		this.modelFrame.updateMatrixWorld( true );
+
+		renderer.autoClear = false;
+
+		// If the task doesn't exist, then restart it
+		if ( this._task === null ) {
+
+			this._task = this._taskFunction();
+
+			// Clear the target if this is the first render
+			// and we're restarting the task
+			renderer.autoClear = true;
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
+			renderer.clearTarget( target, true, true, true );
+
+		}
+
+		//the model geometries are already sorted such that
+		//* depth-only nodes come first
+		//* transparent nodes come last
+		//* larger nodes come before smaller
+		//TODO if we're using alpha blended transparency
+		//i.e. if (a) there are any transparent nodes and (b) !config.renderer.useDitheredTransparency
+		//then those should be dynamically sorted back to front according to the current viewpoint
+		this.sortedRender = false;
+		const res = this._task.next();
+		this._renderComplete = res.done;
+
+		renderer.sortObjects = this.sortedRender;
+		this.camera.setSize( target.width, target.height );
+		renderer.sortObjects = true; //restore default
+
+		renderer.render( this.scene, this.camera, target );
+
+		MeshPool.releaseAll( m => {
+
+			m.frustumCulled = true;
+
+		} );
+
+		this.postrender( renderer, target, viewWidth, viewHeight );
+
+		target.depthTexture = null;
+
+	}
+
 }

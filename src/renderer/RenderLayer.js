@@ -5,23 +5,31 @@
 // zindex:    used to order the rendered layers
 // enabled:   whether or not to render this layer
 export default class RenderLayer {
-  constructor(zindex = 0, name = 'new render layer') {
-    this.name = name;
-    this.zindex = zindex;
-  }
 
-  /* Interface */
-  redraw() {}
+	constructor( zindex = 0, name = 'new render layer' ) {
 
-  needsToDraw() {
-    return true;
-  }
+		this.name = name;
+		this.zindex = zindex;
 
-  isVisible() {
-    return true;
-  }
+	}
 
-  render(/* renderer, target, viewWidth, viewHeight */) {}
+	/* Interface */
+	redraw() {}
 
-  dispose() {}
+	needsToDraw() {
+
+		return true;
+
+	}
+
+	isVisible() {
+
+		return true;
+
+	}
+
+	render( /* renderer, target, viewWidth, viewHeight */ ) {}
+
+	dispose() {}
+
 }
