@@ -876,11 +876,11 @@ export default {
 			const t = ( planeDistance - e0.dot( planeNormal ) ) / denom;
 			if ( t < eps || t > 1 + eps || isNaN( t ) ) {
 
+				// degenerate case
 				addPoint( e0 );
 				addPoint( e1 );
 
-			} // degenerate
-			else {
+			} else {
 
 				//cont p = e0 + (e1 - e0) * t
 				const p = new THREE.Vector3()
@@ -890,16 +890,17 @@ export default {
 					.add( e0 );
 				if ( e0_dist >= 0 ) {
 
+					// e0 is above the plane
 					addPoint( e0 );
 					addPoint( p );
 
-				} // e0 is above the plane
-				else {
+				} else {
 
+					// e1 is above the plane
 					addPoint( p );
 					addPoint( e1 );
 
-				} // e1 is above the plane
+				}
 
 			}
 
