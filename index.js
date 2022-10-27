@@ -6,12 +6,14 @@ import Model from './src/model/Model.js';
 import AnimationPlayer from './src/model/AnimationPlayer.js';
 import AnnotationLayer from './src/renderer/AnnotationRenderLayer.js';
 import TrackballControls from './src/lib/TrackballControls.module.js';
+import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
 
 function writeOutput(msg) {
   document.getElementById('output').innerText = msg;
 }
 
-const lod = 2;
+const params = new URLSearchParams(window.location.search);
+const lod = params.get('lod') === null ? 2 : parseInt(params.get('lod'));
 const urlStem = './models/m2020-rover/';
 const hierarchyUrl = urlStem + 'hierarchy.json';
 const metadataUrl = urlStem + 'metadata.json';
@@ -19,17 +21,47 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 (async function() {
 
+  let loaded = new Array(3).fill(0);
+  let totals = new Array(3).fill(0);
+  function updateProgressDisplay() {
+    if (totals.includes(0)) return;
+
+    let totalValue = 0;
+    let loadedValue = 0;
+    for (let i = 0; i < 3; i++) {
+      loadedValue += loaded[i];
+      totalValue += totals[i];
+    }
+    
+    let perc = loadedValue / totalValue;
+    writeOutput(`Loading model metadata... ${ (perc * 100).toFixed(2) }%`);
+
+  }
+
+
   writeOutput('Loading model metadata...');
   const [hierarchy, metadata, meshStats] = await Promise.all([
-    fetch(hierarchyUrl).then(res => res.json()),
-    fetch(metadataUrl).then(res => res.json()),
-    fetch(meshStatsUrl).then(res => res.json()),
+    fetchWithProgress(hierarchyUrl, (l, t) => {
+      loaded[0] = l;
+      totals[0] = t;
+      updateProgressDisplay();
+    }).then(res => res.json()),
+    fetchWithProgress(metadataUrl, (l, t) => {
+      loaded[1] = l;
+      totals[1] = t;
+      updateProgressDisplay();
+    }).then(res => res.json()),
+    fetchWithProgress(meshStatsUrl, (l, t) => {
+      loaded[2] = l;
+      totals[2] = t;
+      updateProgressDisplay();
+    }).then(res => res.json()),
   ]);
 
   metadata.name = '';
 
   writeOutput('Downloading model archive...');
-  const model = new Model(hierarchy, metadata, meshStats, urlStem);
+  const model = new Model(hierarchy, metadata, meshStats, urlStem, { minLod: lod });
   const animationPlayer = new AnimationPlayer(model);
 
   // if (model.preprocessDone) {
