@@ -89,7 +89,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
   element.style.width = '100%';
   element.style.height = '100%';
 
-  const modelToWorld = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0));
+  const modelToWorld = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
 
   // TODO: move config to a constructor interface or just fields
   // instead of referencing it in the file
