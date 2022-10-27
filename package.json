@@ -2,6 +2,7 @@
   "name": "web-cad-renderer",
   "scripts": {
     "start": "static-server",
+    "lint": "eslint *.js src/**/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -9,9 +10,9 @@
     "url": ""
   },
   "dependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
+    "eslint": "^7.32.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-jest": "^23.20.0",
     "static-server": "^2.2.1",
     "threading-js": "^1.0.6",
     "three": "^0.95.0"
