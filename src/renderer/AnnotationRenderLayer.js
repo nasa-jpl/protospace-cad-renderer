@@ -1,11 +1,11 @@
 // FBXLoader requires that THREE js be on the window
 import '../lib/three.window.js';
-import '../lib/FBXLoader.js';
 import '../lib/CombinedCamera.js';
 
 import * as THREE from 'three';
 import RenderLayer from './RenderLayer.js';
 import MeshLoader from '../model/MeshLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
 const CombinedCamera = window.THREE.CombinedCamera;
 
@@ -99,7 +99,7 @@ export default class AnnotationRenderLayer extends RenderLayer {
 		if ( ! this._fbxLoader ) {
 
 			const manager = new THREE.LoadingManager();
-			const fbxManager = new window.THREE.FBXLoader( manager );
+			const fbxManager = new FBXLoader( manager );
 
 			const onProgress = () => {};
 

@@ -588,8 +588,8 @@ export default class MeshLoader extends EventDispatcher {
 
 				const geometry = new THREE.BufferGeometry();
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-				if ( normals ) geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3, true ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				if ( normals ) geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3, true ) );
 				else {
 
 					geometry.computeVertexNormals();
@@ -597,7 +597,7 @@ export default class MeshLoader extends EventDispatcher {
 
 				}
 
-				if ( colors ) geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3, true ) );
+				if ( colors ) geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3, true ) );
 
 				geometry.computeBoundingSphere();
 

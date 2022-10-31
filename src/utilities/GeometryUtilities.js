@@ -659,9 +659,9 @@ export default {
 			m.normals = []; //IDK why this is necessary, copied from PLYLoader.js
 			delete m.normals; //IDK why this is necessary, copied from PLYLoader.js
 			m.setIndex( new THREE.BufferAttribute( Uint32Array.from( indices ), 1 ) );
-			m.addAttribute( 'position', new THREE.BufferAttribute( Float32Array.from( vertices ), 3 ) );
-			if ( normals ) m.addAttribute( 'normal', new THREE.BufferAttribute( Int8Array.from( normals ), 3, true ) );
-			if ( colors ) m.addAttribute( 'color', new THREE.BufferAttribute( Uint8Array.from( colors ), 3, true ) );
+			m.setAttribute( 'position', new THREE.BufferAttribute( Float32Array.from( vertices ), 3 ) );
+			if ( normals ) m.setAttribute( 'normal', new THREE.BufferAttribute( Int8Array.from( normals ), 3, true ) );
+			if ( colors ) m.setAttribute( 'color', new THREE.BufferAttribute( Uint8Array.from( colors ), 3, true ) );
 			return m;
 
 		};

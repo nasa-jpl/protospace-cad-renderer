@@ -150,7 +150,7 @@ export default class LayeredRenderer {
 	_render() {
 
 		const renderer = this._renderer;
-		const gl = renderer.context;
+		const gl = renderer.getContext();
 		const camera = this._camera;
 		const scene = this._scene;
 
