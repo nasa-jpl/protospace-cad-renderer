@@ -7,10 +7,38 @@ import { Model } from './src/model/Model.js';
 import { AnimationPlayer } from './src/model/AnimationPlayer.js';
 import { AnnotationRenderLayer } from './src/renderer/AnnotationRenderLayer.js';
 import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
+import GUI from 'three/addons/libs/lil-gui.module.min.js';
+
+function numberWithCommas( x ) {
+
+	return x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' );
+
+}
 
 function writeOutput( msg ) {
 
-	document.getElementById( 'output' ).innerText = msg;
+	const el = document.getElementById( 'output' );
+
+	if ( model ) {
+
+		el.innerText = '';
+		if ( msg ) {
+
+			el.innerText = msg + '\n\n';
+
+		}
+
+		const metadata = model.metadata;
+		el.innerText +=
+			'triangles'.padEnd( 14, ' ' ) + ': ' + numberWithCommas( metadata.num_tris_per_lod[ lod ] ) +
+			'\nobjects'.padEnd( 15, ' ' ) + ': ' + numberWithCommas( metadata.num_nodes ) +
+			'\nmeshes'.padEnd( 15, ' ' ) + ': ' + numberWithCommas( metadata.num_leaves );
+
+	} else {
+
+		el.innerText = msg;
+
+	}
 
 }
 
@@ -20,8 +48,11 @@ const urlStem = './models/m2020-rover/';
 const hierarchyUrl = urlStem + 'hierarchy.json';
 const metadataUrl = urlStem + 'metadata.json';
 const meshStatsUrl = urlStem + 'mesh_stats.json';
+let model;
 
-( async function () {
+init();
+
+async function init () {
 
 	let loaded = new Array( 3 ).fill( 0 );
 	let totals = new Array( 3 ).fill( 0 );
@@ -72,8 +103,10 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	metadata.name = '';
 
 	writeOutput( 'Downloading model archive...' );
-	const model = new Model( hierarchy, metadata, meshStats, urlStem, { maxLod: lod } );
+	model = new Model( hierarchy, metadata, meshStats, urlStem, { maxLod: lod } );
 	const animationPlayer = new AnimationPlayer( model );
+
+	window.model = model;
 
 	// if (model.preprocessDone) {
 	//     writeOutput('');
@@ -124,7 +157,6 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 		colorLayer.camera.setSize( width, height );
 		colorLayer.camera.updateMatrixWorld( true );
 		colorLayer.camera.updateProjectionMatrix();
-		// controls.handleResize();
 		controls.update();
 
 		if ( model && ! model.geometryLoaded ) {
@@ -156,6 +188,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	const controls = new OrbitControls( colorLayer.camera, element );
 	controls.maxDistance = 50;
 	controls.minDistance = 0.25;
+	controls.target.y = - 0.25;
 	controls.addEventListener( 'change', () => {
 
 		colorLayer.redraw();
@@ -332,4 +365,24 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 	} );
 
-} )();
+	const gui = new GUI();
+	gui.add( { lod }, 'lod', [ 0, 1, 2 ] ).onChange( v => {
+
+		params.set( 'lod', v );
+		window.location.search = '?' + params.toString();
+
+	} );
+
+	gui.add( colorLayer, 'triangleLimit', 5000, 10000000, 5000 ).name( 'triangleBudget' ).onChange( v => {
+
+		highlightLayer.triangleLimit = colorLayer.triangleLimit;
+
+	} );
+
+	gui.add( colorLayer, 'geometryLimit', 100, 10000, 100 ).name( 'geometryBudget' ).onChange( v => {
+
+		highlightLayer.geometryLimit = colorLayer.geometryLimit;
+
+	} );
+
+}
