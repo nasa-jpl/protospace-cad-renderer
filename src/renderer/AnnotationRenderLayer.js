@@ -1,7 +1,7 @@
 import * as THREE from 'three';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import RenderLayer from './RenderLayer.js';
 import MeshLoader from '../model/MeshLoader.js';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { CombinedCamera } from '../lib/CombinedCamera.js';
 
 /* Render Layer for rendering annotations on the 3D scene */
@@ -9,83 +9,85 @@ export default class AnnotationRenderLayer extends RenderLayer {
 
 	get vertexShader() {
 
-		return `
-      // Lighting
-      struct DirLight {
-          vec3 color;
-          vec3 direction;
-      };
+		return /* glsl */`
+			// Lighting
+			struct DirLight {
+				vec3 color;
+				vec3 direction;
+			};
 
-      varying vec2 vUv;
-      varying vec4 worldPos;
-      varying vec3 vecNormal;
+			varying vec2 vUv;
+			varying vec4 worldPos;
+			varying vec3 vecNormal;
 
-      uniform vec3 ambientLightColor;
+			uniform vec3 ambientLightColor;
 
-      #if NUM_DIR_LIGHTS
-      uniform DirLight directionalLights[NUM_DIR_LIGHTS];
-      #endif
+			#if NUM_DIR_LIGHTS
+			uniform DirLight directionalLights[NUM_DIR_LIGHTS];
+			#endif
 
-      varying vec3 lightColor;
+			varying vec3 lightColor;
 
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-        worldPos = vec4(position,1.0);
-        vecNormal = normalize((modelViewMatrix * vec4(normal, 0)).xyz);
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+				worldPos = vec4(position,1.0);
+				vecNormal = normalize((modelViewMatrix * vec4(normal, 0)).xyz);
 
-        lightColor = ambientLightColor;
+				lightColor = ambientLightColor;
 
-        #if NUM_DIR_LIGHTS
-        for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
-            DirLight dl = directionalLights[i];
-            lightColor += clamp(dot(vecNormal, dl.direction), 0.0, 1.0) * dl.color;
-        }
-        #endif
-      }`;
+				#if NUM_DIR_LIGHTS
+				for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
+					DirLight dl = directionalLights[i];
+					lightColor += clamp(dot(vecNormal, dl.direction), 0.0, 1.0) * dl.color;
+				}
+				#endif
+			}
+		`;
 
 	}
 
 	get fragmentShader() {
 
-		return `
-    varying vec2 vUv;
-    varying vec4 worldPos;
-    varying vec3 vecNormal;
-    varying vec3 lightColor;
+		return /* glsl */`
+			varying vec2 vUv;
+			varying vec4 worldPos;
+			varying vec3 vecNormal;
+			varying vec3 lightColor;
 
-    uniform vec4 _Color;
-    uniform sampler2D _DepthTexture;
-    uniform float _DrawThroughAlpha;
+			uniform vec4 _Color;
+			uniform sampler2D _DepthTexture;
+			uniform float _DrawThroughAlpha;
 
-    uniform bool _UseOptionalTexture;
-    uniform sampler2D _OptionalTexture;
-    uniform int _DepthTexWidth;
-    uniform int _DepthTexHeight;
+			uniform bool _UseOptionalTexture;
+			uniform sampler2D _OptionalTexture;
+			uniform int _DepthTexWidth;
+			uniform int _DepthTexHeight;
 
-    ${MeshLoader.shaderFunctions.isDithered}
+			${MeshLoader.shaderFunctions.isDithered}
 
-    void main(void)
-    {
-      float widthFraction = gl_FragCoord.x / float(_DepthTexWidth);
-      float heightFraction = gl_FragCoord.y / float(_DepthTexHeight);
+			void main(void)
+			{
+				float widthFraction = gl_FragCoord.x / float(_DepthTexWidth);
+				float heightFraction = gl_FragCoord.y / float(_DepthTexHeight);
 
-      float unscaledColorLayerDepth = texture2D(_DepthTexture, vec2(widthFraction, heightFraction)).x;
-      if (gl_FragCoord.z > unscaledColorLayerDepth) {
-        if(isDithered(gl_FragCoord.xy, _DrawThroughAlpha) < 0.0) discard;
-      }
+				float unscaledColorLayerDepth = texture2D(_DepthTexture, vec2(widthFraction, heightFraction)).x;
+				if (gl_FragCoord.z > unscaledColorLayerDepth) {
+					if(isDithered(gl_FragCoord.xy, _DrawThroughAlpha) < 0.0) discard;
+				}
 
-      vec4 res;
+				vec4 res;
 
-      if (_UseOptionalTexture) {
-        res = texture2D(_OptionalTexture, vUv);
-      } else {
-        res = _Color;
-      }
+				if (_UseOptionalTexture) {
+					res = texture2D(_OptionalTexture, vUv);
+				} else {
+					res = _Color;
+				}
 
-      res.rgb *= lightColor;
-      gl_FragColor = res;
-    }`;
+				res.rgb *= lightColor;
+				gl_FragColor = res;
+			}
+		`;
 
 	}
 

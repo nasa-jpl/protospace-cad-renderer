@@ -15,132 +15,136 @@ export default class MeshLoader extends EventDispatcher {
 	static get shaderFunctions() {
 
 		return {
-			isDithered: `float isDithered(vec2 pos, float alpha) {
-        // Define a dither threshold matrix which can be used to define how
-        // a 4x4 set of pixels will be dithered. Used to ensure transparent objects
-        // can render to the depth buffer instead of rendering only at the end
-        // of a full iterative render pass.
-        float DITHER_THRESHOLDS[16];
-        DITHER_THRESHOLDS[0] = 1.0 / 17.0;
-        DITHER_THRESHOLDS[1] = 9.0 / 17.0;
-        DITHER_THRESHOLDS[2] = 3.0 / 17.0;
-        DITHER_THRESHOLDS[3] = 11.0 / 17.0;
+			isDithered: /* glsl */`
+				float isDithered(vec2 pos, float alpha) {
+					// Define a dither threshold matrix which can be used to define how
+					// a 4x4 set of pixels will be dithered. Used to ensure transparent objects
+					// can render to the depth buffer instead of rendering only at the end
+					// of a full iterative render pass.
+					float DITHER_THRESHOLDS[16];
+					DITHER_THRESHOLDS[0] = 1.0 / 17.0;
+					DITHER_THRESHOLDS[1] = 9.0 / 17.0;
+					DITHER_THRESHOLDS[2] = 3.0 / 17.0;
+					DITHER_THRESHOLDS[3] = 11.0 / 17.0;
 
-        DITHER_THRESHOLDS[4] = 13.0 / 17.0;
-        DITHER_THRESHOLDS[5] = 5.0 / 17.0;
-        DITHER_THRESHOLDS[6] = 15.0 / 17.0;
-        DITHER_THRESHOLDS[7] = 7.0 / 17.0;
+					DITHER_THRESHOLDS[4] = 13.0 / 17.0;
+					DITHER_THRESHOLDS[5] = 5.0 / 17.0;
+					DITHER_THRESHOLDS[6] = 15.0 / 17.0;
+					DITHER_THRESHOLDS[7] = 7.0 / 17.0;
 
-        DITHER_THRESHOLDS[8] = 4.0 / 17.0;
-        DITHER_THRESHOLDS[9] = 12.0 / 17.0;
-        DITHER_THRESHOLDS[10] = 2.0 / 17.0;
-        DITHER_THRESHOLDS[11] = 10.0 / 17.0;
+					DITHER_THRESHOLDS[8] = 4.0 / 17.0;
+					DITHER_THRESHOLDS[9] = 12.0 / 17.0;
+					DITHER_THRESHOLDS[10] = 2.0 / 17.0;
+					DITHER_THRESHOLDS[11] = 10.0 / 17.0;
 
-        DITHER_THRESHOLDS[12] = 16.0 / 17.0;
-        DITHER_THRESHOLDS[13] = 8.0 / 17.0;
-        DITHER_THRESHOLDS[14] = 14.0 / 17.0;
-        DITHER_THRESHOLDS[15] = 6.0 / 17.0;
+					DITHER_THRESHOLDS[12] = 16.0 / 17.0;
+					DITHER_THRESHOLDS[13] = 8.0 / 17.0;
+					DITHER_THRESHOLDS[14] = 14.0 / 17.0;
+					DITHER_THRESHOLDS[15] = 6.0 / 17.0;
 
-        int modx = int(mod(floor(pos.x), 4.0));
-        int mody = int(mod(floor(pos.y), 4.0));
+					int modx = int(mod(floor(pos.x), 4.0));
+					int mody = int(mod(floor(pos.y), 4.0));
 
-        // array accessors must be constant, so we use a loop
-        // here, which is unrolled with constant values
-        int index = modx * 4 + mody;
-        float thresh = 0.0;
-        for (int i=0; i < 16; i++) {
-          float b = float((i - index) == 0);
-          thresh = b * DITHER_THRESHOLDS[i] + (1.0 - b) * thresh;
-        }
+					// array accessors must be constant, so we use a loop
+					// here, which is unrolled with constant values
+					int index = modx * 4 + mody;
+					float thresh = 0.0;
+					for (int i=0; i < 16; i++) {
+					float b = float((i - index) == 0);
+					thresh = b * DITHER_THRESHOLDS[i] + (1.0 - b) * thresh;
+					}
 
-        return alpha - thresh;
-      }`,
+					return alpha - thresh;
+				}
+			`,
 		};
 
 	}
 
 	static get vertexShader() {
 
-		return `
-      // Lighting
-      struct DirLight {
-          vec3 color;
-          vec3 direction;
-      };
+		return /* glsl */`
+			// Lighting
+			struct DirLight {
+				vec3 color;
+				vec3 direction;
+			};
 
-      varying vec2 vUv;
-      varying vec4 worldPos;
-      varying vec3 vecNormal;
+			varying vec2 vUv;
+			varying vec4 worldPos;
+			varying vec3 vecNormal;
 
-      uniform vec3 ambientLightColor;
+			uniform vec3 ambientLightColor;
 
-      #if NUM_DIR_LIGHTS
-      uniform DirLight directionalLights[NUM_DIR_LIGHTS];
-      #endif
+			#if NUM_DIR_LIGHTS
+			uniform DirLight directionalLights[NUM_DIR_LIGHTS];
+			#endif
 
-      attribute vec3 color; //vertex color
-      varying vec3 outColor;
+			attribute vec3 color; //vertex color
+			varying vec3 outColor;
 
-      uniform float _NormalDirection;
-      uniform float _VertexColorMultiplier;
+			uniform float _NormalDirection;
+			uniform float _VertexColorMultiplier;
 
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-        worldPos = modelMatrix * vec4(position,1.0);
-        vecNormal = normalize((modelViewMatrix * vec4(normal, 0)).xyz * _NormalDirection);
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+				worldPos = modelMatrix * vec4(position,1.0);
+				vecNormal = normalize((modelViewMatrix * vec4(normal, 0)).xyz * _NormalDirection);
 
-        outColor = ambientLightColor;
+				outColor = ambientLightColor;
 
-        #if NUM_DIR_LIGHTS
-        for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
-            DirLight dl = directionalLights[i];
-            outColor += clamp(dot(vecNormal, dl.direction), 0.0, 1.0) * dl.color;
-        }
-        #endif
+				#if NUM_DIR_LIGHTS
+				for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
+					DirLight dl = directionalLights[i];
+					outColor += clamp(dot(vecNormal, dl.direction), 0.0, 1.0) * dl.color;
+				}
+				#endif
 
-        outColor *= mix(vec3(1, 1, 1), color, _VertexColorMultiplier);
-      }`;
+				outColor *= mix(vec3(1, 1, 1), color, _VertexColorMultiplier);
+			}
+		`;
 
 	}
 
 	static get fragmentShader() {
 
-		return `
-    varying vec2 vUv;
-    varying vec4 worldPos;
-    varying vec3 vecNormal;
-    varying vec3 outColor;
+		return /* glsl */`
+			varying vec2 vUv;
+			varying vec4 worldPos;
+			varying vec3 vecNormal;
+			varying vec3 outColor;
 
-    uniform vec4 _Color;
-    uniform vec3 _Emission;
-    uniform bool PS_M_DITHER_TRANSPARENCY;
-    uniform bool PS_M_CLIP;
-    uniform vec3 _PSClipPlanePosition;
-    uniform vec3 _PSClipPlaneNormal;
+			uniform vec4 _Color;
+			uniform vec3 _Emission;
+			uniform bool PS_M_DITHER_TRANSPARENCY;
+			uniform bool PS_M_CLIP;
+			uniform vec3 _PSClipPlanePosition;
+			uniform vec3 _PSClipPlaneNormal;
 
-    ${this.shaderFunctions.isDithered}
+			${this.shaderFunctions.isDithered}
 
-    void main(void) {
+			void main(void) {
 
-      if (PS_M_DITHER_TRANSPARENCY && isDithered(gl_FragCoord.xy, _Color.a) < 0.0) {
-        discard;
-      }
+				if (PS_M_DITHER_TRANSPARENCY && isDithered(gl_FragCoord.xy, _Color.a) < 0.0) {
+					discard;
+				}
 
-      // Discard if on the wrong side of the cut plane
-      if (PS_M_CLIP) {
-        vec3 planePointToWorldPos = worldPos.xyz - _PSClipPlanePosition;
-        if (dot(normalize(planePointToWorldPos), normalize(_PSClipPlaneNormal)) < 0.0) {
-          discard;
-        }
-      }
+				// Discard if on the wrong side of the cut plane
+				if (PS_M_CLIP) {
+					vec3 planePointToWorldPos = worldPos.xyz - _PSClipPlanePosition;
+					if (dot(normalize(planePointToWorldPos), normalize(_PSClipPlaneNormal)) < 0.0) {
+					discard;
+					}
+				}
 
-      vec4 res = _Color;
-      res.rgb *= outColor;
+				vec4 res = _Color;
+				res.rgb *= outColor;
 
-      res.rgb += _Emission;
-      gl_FragColor = res;
-    }`;
+				res.rgb += _Emission;
+				gl_FragColor = res;
+			}
+		`;
 
 	}
 
