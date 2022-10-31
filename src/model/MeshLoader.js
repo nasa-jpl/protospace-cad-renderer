@@ -87,21 +87,25 @@ export default class MeshLoader extends EventDispatcher {
 			uniform float _VertexColorMultiplier;
 
 			void main() {
+
 				vUv = uv;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-				worldPos = modelMatrix * vec4(position,1.0);
-				vecNormal = normalize((modelViewMatrix * vec4(normal, 0)).xyz * _NormalDirection);
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				worldPos = modelMatrix * vec4( position, 1.0 );
+				vecNormal = normalize( ( modelViewMatrix * vec4( normal, 0 ) ).xyz * _NormalDirection );
 
 				outColor = ambientLightColor;
 
 				#if NUM_DIR_LIGHTS
-				for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
-					DirLight dl = directionalLights[i];
-					outColor += clamp(dot(vecNormal, dl.direction), 0.0, 1.0) * dl.color;
+				for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+
+					DirLight dl = directionalLights[ i ];
+					outColor += clamp( dot( vecNormal, dl.direction ), 0.0, 1.0 ) * dl.color;
+
 				}
 				#endif
 
-				outColor *= mix(vec3(1, 1, 1), color, _VertexColorMultiplier) / 3.1415926535;
+				outColor *= mix( vec3( 1, 1, 1 ), color, _VertexColorMultiplier ) / 3.1415926535;
+
 			}
 		`;
 
@@ -122,20 +126,26 @@ export default class MeshLoader extends EventDispatcher {
 			uniform vec3 _PSClipPlanePosition;
 			uniform vec3 _PSClipPlaneNormal;
 
-			${this.shaderFunctions.isDithered}
+			${ this.shaderFunctions.isDithered }
 
-			void main(void) {
+			void main( void ) {
 
-				if (PS_M_DITHER_TRANSPARENCY && isDithered(gl_FragCoord.xy, _Color.a) < 0.0) {
+				if ( PS_M_DITHER_TRANSPARENCY && isDithered( gl_FragCoord.xy, _Color.a ) < 0.0 ) {
+
 					discard;
+
 				}
 
 				// Discard if on the wrong side of the cut plane
-				if (PS_M_CLIP) {
+				if ( PS_M_CLIP ) {
+
 					vec3 planePointToWorldPos = worldPos.xyz - _PSClipPlanePosition;
-					if (dot(normalize(planePointToWorldPos), normalize(_PSClipPlaneNormal)) < 0.0) {
-					discard;
+					if ( dot( normalize( planePointToWorldPos ), normalize( _PSClipPlaneNormal ) ) < 0.0 ) {
+
+						discard;
+
 					}
+
 				}
 
 				vec4 res = _Color;
@@ -143,6 +153,7 @@ export default class MeshLoader extends EventDispatcher {
 
 				res.rgb += _Emission;
 				gl_FragColor = res;
+
 			}
 		`;
 
