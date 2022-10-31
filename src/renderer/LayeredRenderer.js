@@ -71,6 +71,7 @@ export class LayeredRenderer {
 		this._scene = new THREE.Scene();
 		this._renderer = new THREE.WebGLRenderer();
 		this._renderer.setPixelRatio( window.devicePixelRatio );
+		this._renderer.outputEncoding = THREE.sRGBEncoding;
 		this._camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 1000 );
 		this._layers = [];
 

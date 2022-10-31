@@ -132,7 +132,7 @@ async function init () {
 
 
 	// create the renderer
-	const backgroundColor = 0x151515;
+	const backgroundColor = new THREE.Color( 0x151515 ).convertSRGBToLinear();
 	const renderer = new LayeredRenderer( backgroundColor );
 	const element = renderer.domElement;
 	renderer.prerender = function ( width, height ) {

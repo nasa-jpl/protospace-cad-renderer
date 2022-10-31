@@ -201,14 +201,14 @@ export class MeshLoader extends EventDispatcher {
 				uniforms: THREE.UniformsUtils.merge( [
 					THREE.UniformsLib.lights,
 					{
-						PS_M_CLIP: { type: 'b', value: false },
-						PS_M_DITHER_TRANSPARENCY: { type: 'b', value: false },
-						_Color: { type: 'v4', value: new THREE.Vector4( 0.0, 0.0, 0.0, 0.0 ) },
-						_Emission: { type: 'v3', value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
-						_PSClipPlanePosition: { type: 'v3', value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
-						_PSClipPlaneNormal: { type: 'v3', value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
-						_NormalDirection: { type: 'f', value: 1 },
-						_VertexColorMultiplier: { type: 'f', value: 1 },
+						PS_M_CLIP: { value: false },
+						PS_M_DITHER_TRANSPARENCY: { value: false },
+						_Color: { value: new THREE.Vector4( 0.0, 0.0, 0.0, 0.0 ) },
+						_Emission: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
+						_PSClipPlanePosition: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
+						_PSClipPlaneNormal: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
+						_NormalDirection: { value: 1 },
+						_VertexColorMultiplier: { value: 1 },
 					},
 				] ),
 				vertexShader: this.vertexShader,
@@ -219,6 +219,7 @@ export class MeshLoader extends EventDispatcher {
 		}
 
 		const newMat = this.genericShaderMat.clone();
+		const linearColor = new THREE.Color( color.r, color.g, color.b ).convertSRGBToLinear()
 
 		//these properties are added to the material only for the convience of other ProtoSpace code
 		newMat.color = color;
@@ -234,7 +235,7 @@ export class MeshLoader extends EventDispatcher {
 		newMat.transparent = ! USE_DITHERED_TRANSPARENCY && newMat.useAlpha;
 
 		newMat.uniforms = THREE.UniformsUtils.clone( this.genericShaderMat.uniforms );
-		newMat.uniforms._Color.value = new THREE.Vector4( color.r, color.g, color.b, color.a );
+		newMat.uniforms._Color.value = new THREE.Vector4( linearColor.r, linearColor.g, linearColor.b, color.a );
 
 		newMat.uniforms.PS_M_DITHER_TRANSPARENCY.value = USE_DITHERED_TRANSPARENCY && newMat.useAlpha;
 		newMat.uniforms._PSClipPlanePosition.value = new THREE.Vector3( 0.0, 0.0, 0.0 );
