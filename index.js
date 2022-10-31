@@ -102,8 +102,6 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	const backgroundColor = 0x151515;
 	const renderer = new LayeredRenderer( backgroundColor );
 	const element = renderer.domElement;
-	renderer.antialiasing = 2;
-	renderer.accountForDPI = true;
 	renderer.prerender = function ( width, height ) {
 
 		if ( model.geometryLoaded ) {

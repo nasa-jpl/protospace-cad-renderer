@@ -250,7 +250,7 @@ export default class LayeredRenderer {
 			}
 
 			this._compositeBuffer.target.setSize( targetWidth, targetHeight );
-			
+
 			renderer.setRenderTarget( this._compositeBuffer.target );
 			renderer.render( this._scene, this._camera );
 			renderer.setRenderTarget( null );

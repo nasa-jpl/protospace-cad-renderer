@@ -16,6 +16,7 @@ export default class MeshLoader extends EventDispatcher {
 
 		return {
 			isDithered: /* glsl */`
+
 				float isDithered( vec2 pos, float alpha ) {
 
 					// Define a dither threshold matrix which can be used to define how
@@ -43,20 +44,13 @@ export default class MeshLoader extends EventDispatcher {
 					DITHER_THRESHOLDS[ 14 ] = 14.0 / 17.0;
 					DITHER_THRESHOLDS[ 15 ] = 6.0 / 17.0;
 
-					int modx = int( mod( floor( pos.x ), 4.0 ) );
-					int mody = int( mod( floor( pos.y ), 4.0 ) );
+					int modx = int( pos.x ) % 4;
+					int mody = int( pos.y ) % 4;
 
 					// array accessors must be constant, so we use a loop
 					// here, which is unrolled with constant values
 					int index = modx * 4 + mody;
-					float thresh = 0.0;
-					for ( int i = 0; i < 16; i ++ ) {
-
-						float b = float( ( i - index ) == 0 );
-						thresh = b * DITHER_THRESHOLDS[ i ] + ( 1.0 - b ) * thresh;
-
-					}
-
+					float thresh = DITHER_THRESHOLDS[ index ];
 					return alpha - thresh;
 
 				}
