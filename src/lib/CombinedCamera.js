@@ -53,6 +53,7 @@ CombinedCamera.prototype.toPerspective = function() {
   this.cameraP.updateProjectionMatrix();
 
   this.projectionMatrix = this.cameraP.projectionMatrix;
+  this.projectionMatrixInverse = this.cameraP.projectionMatrixInverse;
 
   //this.inPerspectiveMode = true;
   //this.inOrthographicMode = false;
@@ -113,6 +114,7 @@ CombinedCamera.prototype.toOrthographic = function() {
   this.cameraO.updateProjectionMatrix();
 
   this.projectionMatrix = this.cameraO.projectionMatrix;
+  this.projectionMatrixInverse = this.cameraO.projectionMatrixInverse;
 
   this.isPerspectiveCamera = false;
   this.isOrthographicCamera = true;
