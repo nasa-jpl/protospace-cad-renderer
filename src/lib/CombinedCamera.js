@@ -11,33 +11,32 @@ import * as THREE from 'three';
  */
 
 //CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar ) {
-const CombinedCamera = function(width, height, fov, near, far) {
-  THREE.Camera.call(this);
+class CombinedCamera extends THREE.Camera {
+  constructor(width, height, fov, near, far) {
+    super();
 
-  this.fov = fov;
+    this.fov = fov;
 
-  this.far = far;
-  this.near = near;
+    this.far = far;
+    this.near = near;
 
-  this.left = -width / 2;
-  this.right = width / 2;
-  this.top = height / 2;
-  this.bottom = -height / 2;
+    this.left = -width / 2;
+    this.right = width / 2;
+    this.top = height / 2;
+    this.bottom = -height / 2;
 
-  this.aspect = width / height;
-  this.zoom = 1;
-  this.view = null;
-  // We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
+    this.aspect = width / height;
+    this.zoom = 1;
+    this.view = null;
+    // We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
-  //this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
-  this.cameraO = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, near, far);
-  this.cameraP = new THREE.PerspectiveCamera(fov, width / height, near, far);
+    //this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
+    this.cameraO = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, near, far);
+    this.cameraP = new THREE.PerspectiveCamera(fov, width / height, near, far);
 
-  this.toPerspective();
-};
-
-CombinedCamera.prototype = Object.create(THREE.Camera.prototype);
-CombinedCamera.prototype.constructor = CombinedCamera;
+    this.toPerspective();
+  }
+}
 
 CombinedCamera.prototype.isCombinedCamera = true;
 
