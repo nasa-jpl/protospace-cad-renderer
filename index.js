@@ -138,8 +138,6 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 	};
 
-	window.renderer = renderer;
-
 	document.body.appendChild( element );
 	element.style.width = '100%';
 	element.style.height = '100%';
@@ -173,6 +171,8 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	colorLayer.depthTexture.type = THREE.UnsignedIntType;
 	colorLayer.triangleLimit = 2000000;
 	colorLayer.geometryLimit = 2000;
+	colorLayer.camera.position.set( 2, 2, 2 );
+
 	// colorLayer.clipPlane = this.clipPlane;
 
 	colorLayer.isVisible = () => model && model.geometryLoaded;
