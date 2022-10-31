@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import LayeredRenderer from './src/renderer/LayeredRenderer.js';
 import ModelRenderLayer from './src/renderer/ModelRenderLayer.js';
 import ModelCaster from './src/renderer/ModelCaster.js';
@@ -126,7 +126,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 		colorLayer.camera.setSize( width, height );
 		colorLayer.camera.updateMatrixWorld( true );
 		colorLayer.camera.updateProjectionMatrix();
-		controls.handleResize();
+		// controls.handleResize();
 		controls.update();
 
 		if ( model && ! model.geometryLoaded ) {
@@ -157,14 +157,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	directionalLight.position.set( 1, 1, 1 );
 	directionalLight.updateMatrixWorld();
 
-	const controls = new TrackballControls( colorLayer.camera, element );
-	controls.rotateSpeed = 10.0;
-	controls.zoomSpeed = 5;
-	controls.panSpeed = 2;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
+	const controls = new OrbitControls( colorLayer.camera, element );
 	controls.maxDistance = 50;
 	controls.minDistance = 0.25;
 	controls.addEventListener( 'change', () => {
@@ -178,7 +171,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	colorLayer.scene.add( directionalLight );
 	colorLayer.depthTexture = new THREE.DepthTexture();
 	colorLayer.depthTexture.type = THREE.UnsignedIntType;
-	colorLayer.triangleLimit = 1000000;
+	colorLayer.triangleLimit = 2000000;
 	colorLayer.geometryLimit = 2000;
 	// colorLayer.clipPlane = this.clipPlane;
 
