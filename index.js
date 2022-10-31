@@ -1,4 +1,4 @@
-import * as THREE from './node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 import LayeredRenderer from './src/renderer/LayeredRenderer.js';
 import ModelRenderLayer from './src/renderer/ModelRenderLayer.js';
 import ModelCaster from './src/renderer/ModelCaster.js';

@@ -1,5 +1,5 @@
 import '../lib/lzf.js';
-import * as THREE from '/node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 import ThreadQueue from '/node_modules/threading-js/ThreadQueue.js';
 import EventDispatcher from './EventDispatcher.js';
 import JobQueue from '../utilities/JobQueue.js';

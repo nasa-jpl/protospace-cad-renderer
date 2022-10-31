@@ -1,4 +1,4 @@
-import * as OrigTHREE from '/node_modules/three/build/three.module.js';
+import * as OrigTHREE from 'three';
 
 // adding imports
 // trackback controls references itself on the THREE object everywhere, so

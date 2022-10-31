@@ -1,4 +1,4 @@
-import * as THREE from '/node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 
 // THREE.Mesh pool used for allocating meshes to reuse
 // Allocated meshes should be used on a single frame and

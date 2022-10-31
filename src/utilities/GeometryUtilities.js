@@ -1,4 +1,4 @@
-import * as THREE from '/node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 
 /* a lot of this is translated from C++; it's more important to match that than to strictly follow naming conventions */
 /* eslint-disable camelcase */

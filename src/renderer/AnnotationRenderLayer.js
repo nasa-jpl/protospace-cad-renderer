@@ -3,7 +3,7 @@ import '../lib/three.window.js';
 import '../lib/FBXLoader.js';
 import '../lib/CombinedCamera.js';
 
-import * as THREE from '/node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 import RenderLayer from './RenderLayer.js';
 import MeshLoader from '../model/MeshLoader.js';
 
