@@ -1,11 +1,11 @@
 import * as THREE from 'three';
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import LayeredRenderer from './src/renderer/LayeredRenderer.js';
 import ModelRenderLayer from './src/renderer/ModelRenderLayer.js';
 import ModelCaster from './src/renderer/ModelCaster.js';
 import Model from './src/model/Model.js';
 import AnimationPlayer from './src/model/AnimationPlayer.js';
 import AnnotationLayer from './src/renderer/AnnotationRenderLayer.js';
-import TrackballControls from './src/lib/TrackballControls.module.js';
 import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
 
 function writeOutput( msg ) {
@@ -72,7 +72,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	metadata.name = '';
 
 	writeOutput( 'Downloading model archive...' );
-	const model = new Model( hierarchy, metadata, meshStats, urlStem, { minLod: lod } );
+	const model = new Model( hierarchy, metadata, meshStats, urlStem, { maxLod: lod } );
 	const animationPlayer = new AnimationPlayer( model );
 
 	// if (model.preprocessDone) {

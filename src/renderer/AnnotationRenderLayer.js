@@ -1,13 +1,8 @@
-// FBXLoader requires that THREE js be on the window
-import '../lib/three.window.js';
-import '../lib/CombinedCamera.js';
-
 import * as THREE from 'three';
 import RenderLayer from './RenderLayer.js';
 import MeshLoader from '../model/MeshLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-
-const CombinedCamera = window.THREE.CombinedCamera;
+import { CombinedCamera } from '../lib/CombinedCamera.js';
 
 /* Render Layer for rendering annotations on the 3D scene */
 export default class AnnotationRenderLayer extends RenderLayer {

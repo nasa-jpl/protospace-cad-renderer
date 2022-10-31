@@ -1,13 +1,8 @@
-// CombinedCamera expects THREE to be on the window
-import '../lib/three.window.js';
-import '../lib/CombinedCamera.js';
-
 import * as THREE from 'three';
 import RenderLayer from './RenderLayer.js';
 import MeshPool from './MeshPool.js';
 import MeshLoader from '../model/MeshLoader.js';
-
-const CombinedCamera = window.THREE.CombinedCamera;
+import { CombinedCamera } from '../lib/CombinedCamera.js';
 
 /* Render Layer for rending models nodes over multiple frames */
 export default class ModelRenderLayer extends RenderLayer {
