@@ -16,45 +16,49 @@ export default class MeshLoader extends EventDispatcher {
 
 		return {
 			isDithered: /* glsl */`
-				float isDithered(vec2 pos, float alpha) {
+				float isDithered( vec2 pos, float alpha ) {
+
 					// Define a dither threshold matrix which can be used to define how
 					// a 4x4 set of pixels will be dithered. Used to ensure transparent objects
 					// can render to the depth buffer instead of rendering only at the end
 					// of a full iterative render pass.
-					float DITHER_THRESHOLDS[16];
-					DITHER_THRESHOLDS[0] = 1.0 / 17.0;
-					DITHER_THRESHOLDS[1] = 9.0 / 17.0;
-					DITHER_THRESHOLDS[2] = 3.0 / 17.0;
-					DITHER_THRESHOLDS[3] = 11.0 / 17.0;
+					float DITHER_THRESHOLDS[ 16 ];
+					DITHER_THRESHOLDS[ 0 ] = 1.0 / 17.0;
+					DITHER_THRESHOLDS[ 1 ] = 9.0 / 17.0;
+					DITHER_THRESHOLDS[ 2 ] = 3.0 / 17.0;
+					DITHER_THRESHOLDS[ 3 ] = 11.0 / 17.0;
 
-					DITHER_THRESHOLDS[4] = 13.0 / 17.0;
-					DITHER_THRESHOLDS[5] = 5.0 / 17.0;
-					DITHER_THRESHOLDS[6] = 15.0 / 17.0;
-					DITHER_THRESHOLDS[7] = 7.0 / 17.0;
+					DITHER_THRESHOLDS[ 4 ] = 13.0 / 17.0;
+					DITHER_THRESHOLDS[ 5 ] = 5.0 / 17.0;
+					DITHER_THRESHOLDS[ 6 ] = 15.0 / 17.0;
+					DITHER_THRESHOLDS[ 7 ] = 7.0 / 17.0;
 
-					DITHER_THRESHOLDS[8] = 4.0 / 17.0;
-					DITHER_THRESHOLDS[9] = 12.0 / 17.0;
-					DITHER_THRESHOLDS[10] = 2.0 / 17.0;
-					DITHER_THRESHOLDS[11] = 10.0 / 17.0;
+					DITHER_THRESHOLDS[ 8 ] = 4.0 / 17.0;
+					DITHER_THRESHOLDS[ 9 ] = 12.0 / 17.0;
+					DITHER_THRESHOLDS[ 10 ] = 2.0 / 17.0;
+					DITHER_THRESHOLDS[ 11 ] = 10.0 / 17.0;
 
-					DITHER_THRESHOLDS[12] = 16.0 / 17.0;
-					DITHER_THRESHOLDS[13] = 8.0 / 17.0;
-					DITHER_THRESHOLDS[14] = 14.0 / 17.0;
-					DITHER_THRESHOLDS[15] = 6.0 / 17.0;
+					DITHER_THRESHOLDS[ 12 ] = 16.0 / 17.0;
+					DITHER_THRESHOLDS[ 13 ] = 8.0 / 17.0;
+					DITHER_THRESHOLDS[ 14 ] = 14.0 / 17.0;
+					DITHER_THRESHOLDS[ 15 ] = 6.0 / 17.0;
 
-					int modx = int(mod(floor(pos.x), 4.0));
-					int mody = int(mod(floor(pos.y), 4.0));
+					int modx = int( mod( floor( pos.x ), 4.0 ) );
+					int mody = int( mod( floor( pos.y ), 4.0 ) );
 
 					// array accessors must be constant, so we use a loop
 					// here, which is unrolled with constant values
 					int index = modx * 4 + mody;
 					float thresh = 0.0;
-					for (int i=0; i < 16; i++) {
-					float b = float((i - index) == 0);
-					thresh = b * DITHER_THRESHOLDS[i] + (1.0 - b) * thresh;
+					for ( int i = 0; i < 16; i ++ ) {
+
+						float b = float( ( i - index ) == 0 );
+						thresh = b * DITHER_THRESHOLDS[ i ] + ( 1.0 - b ) * thresh;
+
 					}
 
 					return alpha - thresh;
+
 				}
 			`,
 		};
