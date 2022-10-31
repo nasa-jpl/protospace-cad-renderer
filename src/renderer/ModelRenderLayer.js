@@ -116,7 +116,7 @@ export default class ModelRenderLayer extends RenderLayer {
 		// means that the camera doesn't get auto-updated, so we
 		// update it manually below
 		this.scene = new THREE.Scene();
-		this.scene.autoUpdate = false;
+		this.scene.matrixWorldAutoUpdate = false;
 
 		this.camera = new CombinedCamera( window.innerWidth, window.innerHeight, 75, 0.1, 1000 );
 		this.camera.position.z = 5;
