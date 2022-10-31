@@ -2,7 +2,7 @@
 // up to a max duration per frame. Used
 // to replace Threading-js when SharedArrayBuffers
 // are unavailable
-export default class JobQueue {
+export class JobQueue {
 
 	constructor( processingTime = 30 ) {
 

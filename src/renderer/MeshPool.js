@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // THREE.Mesh pool used for allocating meshes to reuse
 // Allocated meshes should be used on a single frame and
 // released after using them
-export default class MeshPool {
+export class MeshPool {
 
 	static get pool() {
 

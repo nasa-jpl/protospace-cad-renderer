@@ -1,8 +1,8 @@
 import '../lib/lzf.js';
 import * as THREE from 'three';
 import ThreadQueue from 'threading-js/ThreadQueue.js';
-import EventDispatcher from './EventDispatcher.js';
-import JobQueue from '../utilities/JobQueue.js';
+import { EventDispatcher } from './EventDispatcher.js';
+import { JobQueue } from '../utilities/JobQueue.js';
 
 const USE_DITHERED_TRANSPARENCY = true;
 
@@ -10,7 +10,7 @@ const USE_DITHERED_TRANSPARENCY = true;
 
 // MeshLoader
 // Loads and processes meshes from the server
-export default class MeshLoader extends EventDispatcher {
+export class MeshLoader extends EventDispatcher {
 
 	static get shaderFunctions() {
 

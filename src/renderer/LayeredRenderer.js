@@ -52,7 +52,7 @@ class BufferLayer {
 // LayerRenderer Class
 // A renderer for rendering multiple RenderLayer objects
 // and compositing them in space
-export default class LayeredRenderer {
+export class LayeredRenderer {
 
 	get domElement() {
 

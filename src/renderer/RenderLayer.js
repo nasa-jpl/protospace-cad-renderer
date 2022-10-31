@@ -4,7 +4,7 @@
 // name:      name used in debug spew
 // zindex:    used to order the rendered layers
 // enabled:   whether or not to render this layer
-export default class RenderLayer {
+export class RenderLayer {
 
 	constructor( zindex = 0, name = 'new render layer' ) {
 

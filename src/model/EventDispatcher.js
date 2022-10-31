@@ -1,7 +1,7 @@
 // EventDispatcher
 // Adds hooks for listening and dispatching events
 // Uses a div as a helper to use the addEventListeners, etc
-class EventDispatcher {
+export class EventDispatcher {
 
 	/* Life Cycle */
 	constructor() {
@@ -93,5 +93,3 @@ class EventDispatcher {
 	}
 
 }
-
-export default EventDispatcher;

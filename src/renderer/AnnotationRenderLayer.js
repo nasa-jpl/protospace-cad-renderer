@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import RenderLayer from './RenderLayer.js';
-import MeshLoader from '../model/MeshLoader.js';
+import { RenderLayer } from './RenderLayer.js';
+import { MeshLoader } from '../model/MeshLoader.js';
 import { CombinedCamera } from '../lib/CombinedCamera.js';
 
 /* Render Layer for rendering annotations on the 3D scene */
-export default class AnnotationRenderLayer extends RenderLayer {
+export class AnnotationRenderLayer extends RenderLayer {
 
 	get vertexShader() {
 

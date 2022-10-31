@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import EventDispatcher from './EventDispatcher.js';
-import MeshLoader from './MeshLoader.js';
+import { EventDispatcher } from './EventDispatcher.js';
+import { MeshLoader } from './MeshLoader.js';
 import GeomtryUtilities from '../utilities/GeometryUtilities.js';
 import { TRANSFORM_COMPONENT } from '../utilities/constants.js';
 
@@ -16,7 +16,7 @@ import { TRANSFORM_COMPONENT } from '../utilities/constants.js';
 // 'geometry-load-complete' : fired when all geometry for all nodes has finished loading
 // 'hierarchy-refreshed'    : fired after the whole hierarchy has been synchronized (total triangles, synched, etc)
 
-export default class Model extends EventDispatcher {
+export class Model extends EventDispatcher {
 
 	get root() {
 

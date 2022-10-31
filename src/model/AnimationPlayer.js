@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import EventDispatcher from './EventDispatcher.js';
+import { EventDispatcher } from './EventDispatcher.js';
 
 // "Animation" format
 // {
@@ -23,7 +23,7 @@ import EventDispatcher from './EventDispatcher.js';
 //
 // }
 
-export default class AnimationPlayer extends EventDispatcher {
+export class AnimationPlayer extends EventDispatcher {
 
 	static get BoundaryCondition() {
 

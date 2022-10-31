@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import MeshPool from './MeshPool.js';
+import { MeshPool } from './MeshPool.js';
 import GeometryUtilities from '../utilities/GeometryUtilities.js';
 
 // Static helper class for casting a ray against a model
-export default class ModelCaster {
+export class ModelCaster {
 
 	// pixel must be a -1 to 1 vector representing where in the camera view to cast from
 	// returns { hitNode, hitMesh, hitPoint, hitNormal }

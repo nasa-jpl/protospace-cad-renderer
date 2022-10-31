@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import LayeredRenderer from './src/renderer/LayeredRenderer.js';
-import ModelRenderLayer from './src/renderer/ModelRenderLayer.js';
-import ModelCaster from './src/renderer/ModelCaster.js';
-import Model from './src/model/Model.js';
-import AnimationPlayer from './src/model/AnimationPlayer.js';
-import AnnotationLayer from './src/renderer/AnnotationRenderLayer.js';
+import { LayeredRenderer } from './src/renderer/LayeredRenderer.js';
+import { ModelRenderLayer } from './src/renderer/ModelRenderLayer.js';
+import { ModelCaster } from './src/renderer/ModelCaster.js';
+import { Model } from './src/model/Model.js';
+import { AnimationPlayer } from './src/model/AnimationPlayer.js';
+import { AnnotationRenderLayer } from './src/renderer/AnnotationRenderLayer.js';
 import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
 
 function writeOutput( msg ) {
@@ -254,7 +254,7 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 	renderer.addLayer( highlightLayer );
 
-	const annotationLayer = new AnnotationLayer( 2, 'annotations' );
+	const annotationLayer = new AnnotationRenderLayer( 2, 'annotations' );
 	annotationLayer.prerender = () => annotationLayer.depthTexture = colorLayer.depthTexture;
 	annotationLayer.scene.add( new THREE.AmbientLight( 0xffffff ) );
 	annotationLayer.camera = colorLayer.camera;
