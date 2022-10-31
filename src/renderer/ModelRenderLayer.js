@@ -219,7 +219,9 @@ export default class ModelRenderLayer extends RenderLayer {
 		this.camera.setSize( target.width, target.height );
 		renderer.sortObjects = true; //restore default
 
-		renderer.render( this.scene, this.camera, target );
+		renderer.setRenderTarget( target );
+		renderer.render( this.scene, this.camera );
+		renderer.setRenderTarget( null );
 
 		MeshPool.releaseAll( m => {
 

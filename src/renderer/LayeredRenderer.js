@@ -186,7 +186,8 @@ export default class LayeredRenderer {
 
 		// If the size of the canvas changed from the last time
 		// we drew, then all the children should have to redraw
-		const currSize = renderer.getSize();
+		const currSize = new THREE.Vector2();
+		renderer.getSize( currSize );
 		if ( canvasWidth !== currSize.width || canvasHeight !== currSize.height ) {
 
 			this._layers.forEach( layer => layer.redraw() );
@@ -249,7 +250,11 @@ export default class LayeredRenderer {
 			}
 
 			this._compositeBuffer.target.setSize( targetWidth, targetHeight );
-			renderer.render( this._scene, this._camera, this._compositeBuffer.target );
+			
+			renderer.setRenderTarget( this._compositeBuffer.target );
+			renderer.render( this._scene, this._camera );
+			renderer.setRenderTarget( null );
+
 			renderer.render( this._compositeScene, this._camera );
 
 		} else {
