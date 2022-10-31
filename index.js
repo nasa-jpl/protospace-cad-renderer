@@ -281,14 +281,14 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 	};
 
-	element.addEventListener( 'mousedown', e => {
+	element.addEventListener( 'pointerdown', e => {
 
 		downPos = { x: e.pageX, y: e.pageY };
 		moved = false;
 
 	} );
 
-	element.addEventListener( 'mousemove', e => {
+	element.addEventListener( 'pointermove', e => {
 
 		// mouse move was getting called on some machines
 		// even though it didn't seem like it should, so
@@ -297,7 +297,8 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 
 	} );
 
-	element.addEventListener( 'mouseup', e => {
+	element.addEventListener( 'pointerup', e => {
+
 
 		if ( e.which !== 1 && e.which !== 3 || ! model.preprocessDone ) return;
 

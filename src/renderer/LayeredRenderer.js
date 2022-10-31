@@ -70,7 +70,7 @@ export default class LayeredRenderer {
 		this.useCompositeTarget = true;
 
 		this._scene = new THREE.Scene();
-		this._renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+		this._renderer = new THREE.WebGLRenderer();
 		this._renderer.setPixelRatio( window.devicePixelRatio );
 		this._camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 1000 );
 		this._layers = [];

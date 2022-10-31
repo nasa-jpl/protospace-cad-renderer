@@ -13,7 +13,7 @@ export default class ModelCaster {
 	// hitNormal: model surface normal at hitPoint in world frame
 	// modelToWorld: Matrix4 taking model frame to world frame
 	// worldToModel: Matrix4 taking world frame to model frame, or omit to infer as inverse of modelToWorld
-	static raycast( model, camera, pixel, modelToWorld, worldToModel ) {
+	static raycast( model, camera, pixel, modelToWorld, worldToModel = null ) {
 
 		worldToModel = worldToModel || new THREE.Matrix4().copy( modelToWorld ).invert();
 
