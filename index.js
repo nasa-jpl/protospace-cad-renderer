@@ -178,8 +178,8 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	colorLayer.scene.add( directionalLight );
 	colorLayer.depthTexture = new THREE.DepthTexture();
 	colorLayer.depthTexture.type = THREE.UnsignedIntType;
-	// colorLayer.triangleLimit = config.renderer.triangleBatchLimit;
-	// colorLayer.geometryLimit = config.renderer.geometryBatchLimit;
+	colorLayer.triangleLimit = 1000000;
+	colorLayer.geometryLimit = 2000;
 	// colorLayer.clipPlane = this.clipPlane;
 
 	colorLayer.isVisible = () => model && model.geometryLoaded;
@@ -190,8 +190,8 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	highlightLayer.clearColor = backgroundColor;
 	highlightLayer.clearAlpha = 0.5;
 	highlightLayer.camera = colorLayer.camera;
-	// highlightLayer.triangleLimit = config.renderer.triangleBatchLimit;
-	// highlightLayer.geometryLimit = config.renderer.geometryBatchLimit;
+	highlightLayer.triangleLimit = colorLayer.triangleLimit;
+	highlightLayer.geometryLimit = colorLayer.geometryLimit;
 	// highlightLayer.clipPlane = this.clipPlane;
 
 
