@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 /* a lot of this is translated from C++; it's more important to match that than to strictly follow naming conventions */
-/* eslint-disable camelcase */
 export default {
 	epsilon: 1e-11,
 
