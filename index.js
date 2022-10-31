@@ -167,8 +167,8 @@ const meshStatsUrl = urlStem + 'mesh_stats.json';
 	colorLayer.scene.add( directionalLight );
 	colorLayer.depthTexture = new THREE.DepthTexture();
 	colorLayer.depthTexture.type = THREE.UnsignedIntType;
-	colorLayer.triangleLimit = 2000000;
-	colorLayer.geometryLimit = 2000;
+	colorLayer.triangleLimit = 1500000;
+	colorLayer.geometryLimit = 1500;
 	colorLayer.camera.position.set( 2, 2, 2 );
 
 	// colorLayer.clipPlane = this.clipPlane;

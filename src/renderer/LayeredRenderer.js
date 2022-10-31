@@ -65,8 +65,7 @@ export class LayeredRenderer {
 
 		this.clearColor = bgColor;
 		this.enabled = true;
-		this.accountForDPI = true;
-		this.antialiasing = 1;
+		this.devicePixelRatio = window.devicePixelRatio;
 		this.useCompositeTarget = true;
 
 		this._scene = new THREE.Scene();
@@ -155,14 +154,13 @@ export class LayeredRenderer {
 		const scene = this._scene;
 
 		// scale the renderer based on the AA and the DPI of the screen
-		const scale = this.accountForDPI ? window.devicePixelRatio : 1;
-		const canvasWidth = this.domElement.offsetWidth * scale;
-		const canvasHeight = this.domElement.offsetHeight * scale;
+		const canvasWidth = this.domElement.offsetWidth;
+		const canvasHeight = this.domElement.offsetHeight;
 
 		// the widths and heights of the target account
 		// for anti aliasing
-		let targetWidth = canvasWidth * this.antialiasing;
-		let targetHeight = canvasHeight * this.antialiasing;
+		let targetWidth = canvasWidth * this.devicePixelRatio;
+		let targetHeight = canvasHeight * this.devicePixelRatio;
 
 		// Clamp the texture size the max texture size
 		// that the platform can support
@@ -194,11 +192,7 @@ export class LayeredRenderer {
 
 		}
 
-		// pass false so we don't set the style of the renderer, which would
-		// negate the scaling we apply
-		// Setting the pixel ratio here doesn't affect our render targets, so
-		// just set this to 1 and we'll use the same width and height everywhere
-		renderer.setPixelRatio( 1 );
+		renderer.setPixelRatio( this.devicePixelRatio );
 		renderer.setSize( canvasWidth, canvasHeight, false );
 
 		this.prerender( targetWidth, targetHeight );
@@ -236,7 +230,7 @@ export class LayeredRenderer {
 		// then composite to a separate buffer before rendering to the
 		// canvas to avoid issues with the dithered rendering.
 		// See issue #571
-		if ( this.antialiasing > 1 && this.useCompositeTarget ) {
+		if ( this.useCompositeTarget ) {
 
 			if ( this._compositeBuffer == null ) {
 
