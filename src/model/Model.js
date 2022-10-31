@@ -561,7 +561,7 @@ export default class Model extends EventDispatcher {
 		};
 
 		n.cached.obbToModel = n.cached.nodeToModel;
-		n.cached.modelToOBB = new THREE.Matrix4().getInverse( n.cached.obbToModel );
+		n.cached.modelToOBB = new THREE.Matrix4().copy( n.cached.obbToModel ).invert();
 		n.children.forEach( c => expandBox( c.cached.threejsOBB, c.cached.obbToModel ) );
 		if ( n.geometry ) {
 
@@ -719,10 +719,10 @@ export default class Model extends EventDispatcher {
 		if ( p ) n.cached.nodeToModel = new THREE.Matrix4().multiplyMatrices( p.cached.nodeToModel, n.cached.nodeToParent );
 		else n.cached.nodeToModel = n.cached.nodeToParent;
 
-		n.cached.modelToNode = new THREE.Matrix4().getInverse( n.cached.nodeToModel );
+		n.cached.modelToNode = new THREE.Matrix4().copy( n.cached.nodeToModel ).invert();
 
 		n.cached.obbToModel = new THREE.Matrix4().multiplyMatrices( n.cached.nodeToModel, n.cached.obbToNode );
-		n.cached.modelToOBB = new THREE.Matrix4().getInverse( n.cached.obbToModel );
+		n.cached.modelToOBB = new THREE.Matrix4().copy( n.cached.obbToModel ).invert();
 
 		if ( setOrig || ! n.cached.origNodeToParent ) {
 
@@ -756,7 +756,7 @@ export default class Model extends EventDispatcher {
 
 				}
 
-				n.cached.origModelToNode = new THREE.Matrix4().getInverse( n.cached.origNodeToModel );
+				n.cached.origModelToNode = new THREE.Matrix4().copy( n.cached.origNodeToModel ).invert();
 				n.cached.origOBBToModel = n.cached.origNodeToModel;
 				n.cached.origModelToOBB = n.cached.origModelToNode;
 

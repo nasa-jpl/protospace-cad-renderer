@@ -15,7 +15,7 @@ export default class ModelCaster {
 	// worldToModel: Matrix4 taking world frame to model frame, or omit to infer as inverse of modelToWorld
 	static raycast( model, camera, pixel, modelToWorld, worldToModel ) {
 
-		worldToModel = worldToModel || new THREE.Matrix4().getInverse( modelToWorld );
+		worldToModel = worldToModel || new THREE.Matrix4().copy( modelToWorld ).invert();
 
 		const modelFrame = new THREE.Object3D();
 		modelFrame.matrix = modelFrame.matrixWorld = modelToWorld;

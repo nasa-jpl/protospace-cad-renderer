@@ -741,7 +741,7 @@ export default {
 			const tmp3 = has_normals || has_colors ? [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ] : null;
 
 			const box_to_mesh = new THREE.Matrix4();
-			box_to_mesh.getInverse( meshMatrix, /* throwOnDegenerate */ true );
+			box_to_mesh.copy( meshMatrix, /* throwOnDegenerate */ true ).invert();
 
 			const self = this;
 			function addClippedTri( child ) {
