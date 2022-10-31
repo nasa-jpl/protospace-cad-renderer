@@ -101,7 +101,7 @@ export default class MeshLoader extends EventDispatcher {
 				}
 				#endif
 
-				outColor *= mix(vec3(1, 1, 1), color, _VertexColorMultiplier);
+				outColor *= mix(vec3(1, 1, 1), color, _VertexColorMultiplier) / 3.1415926535;
 			}
 		`;
 
