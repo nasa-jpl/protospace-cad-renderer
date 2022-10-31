@@ -168,8 +168,8 @@ export default class ModelRenderLayer extends RenderLayer {
 
 	render( renderer, target, viewWidth, viewHeight ) {
 
-		target.setSize( viewWidth * this.targetScale, viewHeight * this.targetScale );
 		target.depthTexture = this.depthTexture;
+		target.setSize( viewWidth * this.targetScale, viewHeight * this.targetScale );
 
 		this.prerender( renderer, target, viewWidth, viewHeight );
 
