@@ -198,7 +198,9 @@ export default class ModelRenderLayer extends RenderLayer {
 			// and we're restarting the task
 			renderer.autoClear = true;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.clearTarget( target, true, true, true );
+			renderer.setRenderTarget( target );
+			renderer.clear( true, true, true );
+			renderer.setRenderTarget( null );
 
 		}
 

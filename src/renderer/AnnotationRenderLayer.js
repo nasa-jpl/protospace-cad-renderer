@@ -337,8 +337,10 @@ export default class AnnotationRenderLayer extends RenderLayer {
 
 		// Rendering
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
-		renderer.clearTarget( target, true, true, true );
-		renderer.render( this.scene, this.camera, target );
+		renderer.setRenderTarget( target );
+		renderer.clear( true, true, true );
+		renderer.render( this.scene, this.camera );
+		renderer.setRenderTarget( null );
 
 		this.postrender( renderer, target, viewWidth, viewHeight );
 
