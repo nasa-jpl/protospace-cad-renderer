@@ -4,6 +4,8 @@ Self-contained code for rendering extremely high-fidelity processed CAD models o
 
 Implements techniques for incrementally updating transforms and rendering spacecraft parts, interactiving with complex hierarchies of geometries, minimizing visual impact, and compositing layers of rendered components.
 
+**Warning**: the m2020 model in this repository is over 1.25GB.
+
 ## To Run
 
 1. Run `npm install` in the root folder.

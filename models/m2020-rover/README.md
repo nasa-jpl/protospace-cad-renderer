@@ -4,10 +4,10 @@ A processed 3D model derived from the CAD represenation of the Mars 2020 Perseve
 
 CAD model design and development credit to the Mars 2020 Mechanical Engineering and Mars Helicopter engineering teams.
 
-This research was carried out at the Jet Propulsion Laboratory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration.
+This research was carried out at the Jet Propulsion Laboratory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration (80NM0018D0004).
 
-Released June 10th, 2022
+Released June 10th, 2022.
 
-Release Id URS310134
+Release Ids URS310134 and URS322097.
 
 Credit NASA/JPL-Caltech
