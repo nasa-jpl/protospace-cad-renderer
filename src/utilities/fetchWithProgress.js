@@ -66,7 +66,7 @@ export function fetchWithProgress( url, progressCallback = null ) {
 
 			} else {
 
-				throw new HttpError( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`, response );
+				throw new Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`, response );
 
 			}
 
