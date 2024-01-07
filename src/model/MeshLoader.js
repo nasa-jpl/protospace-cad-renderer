@@ -710,8 +710,11 @@ export class MeshLoader extends EventDispatcher {
 				data: null, // binary data
 			};
 
+			// ensure we're not double-adding slashes
+			const url = ( /[\/]$/.test( this._modelURL ) ? this._modelURL : this._modelURL + '/' ) + archive;
+
 			// fetch the json index for the archive
-			fetch( `${this._modelURL}/${archive}.json`, this._fetchOptions )
+			fetch( `${ url }.json`, this._fetchOptions )
 				.then( res => {
 
 					if ( ! res.ok ) throw new Error( `error fetching model archive index: ${res.status} (${res.statusText})` );
