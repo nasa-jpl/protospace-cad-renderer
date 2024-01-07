@@ -943,7 +943,8 @@ export class Model extends EventDispatcher {
 		let remainingLoads = 0;
 		const archivesDownloadStatus = {};
 
-		const meshLoader = new MeshLoader( `${this._baseURL}/${this.name}`, this._extraFetchOptions );
+		const meshUrlRoot = this.name === '' ? this._baseURL : `${this._baseURL}/${this.name}`;
+		const meshLoader = new MeshLoader( meshUrlRoot, this._extraFetchOptions );
 		meshLoader.listen( 'model-binary-download-progress', e => {
 
 			// printMemory(
