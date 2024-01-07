@@ -7,14 +7,21 @@ resolver.branch = 'main';
 resolver.repo = 'protospace-cad-renderer';
 resolver.org = 'nasa-jpl';
 
-export function lfsFetch( url, options ) {
+export function resolveLfsUrl( url ) {
 
 	if ( /github.io/.test( location.href ) ) {
 
-		url = resolver.resolve( url );
+		return resolver.resolve( url );
 
 	}
 
+	return url;
+
+}
+
+export function lfsFetch( url, options ) {
+
+	url = resolveLfsUrl( url );
 	return fetch( url, options );
 
 }
