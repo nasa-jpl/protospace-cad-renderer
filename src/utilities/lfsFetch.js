@@ -1,7 +1,11 @@
 import { GithubLfsResolver } from './GithubLfsResolver.js';
 
 const resolver = new GithubLfsResolver();
-resolver.pagesStem = location.origin;
+resolver.pagesStem = location.origin + '/protospace-cad-renderer';
+resolver.targetStem = 'https://media.githubusercontent.com/media';
+resolver.branch = 'main';
+resolver.repo = 'protospace-cad-renderer';
+resolver.org = 'nasa-jpl';
 
 export function lfsFetch( url, options ) {
 

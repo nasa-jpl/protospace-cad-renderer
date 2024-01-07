@@ -4,7 +4,9 @@ export class GithubLfsResolver {
 
 		this.pagesStem = '';
 		this.targetStem = 'https://media.githubusercontent.com/media';
-		this.targetBranch = 'main';
+		this.branch = 'main';
+		this.repo = '';
+		this.org = '';
 
 	}
 
@@ -29,12 +31,10 @@ export class GithubLfsResolver {
 
 		}
 
-		const { pagesStem, targetBranch, targetStem } = this;
+		const { pagesStem, targetStem, branch, org, repo } = this;
 		const remainder = url.href.substring( pagesStem.length );
 		const tokens = remainder.split( /[\/]/g );
-		const githubOrg = tokens.shift();
-		const githubRepo = tokens.shift();
-		return `${ targetStem }/${ githubOrg }/${ githubRepo }/${ targetBranch }/${ tokens.join( '/' ) }`;
+		return `${ targetStem }/${ org }/${ repo }/${ branch }/${ tokens.join( '/' ) }`;
 
 	}
 
