@@ -3,7 +3,6 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { RenderLayer } from './RenderLayer.js';
 import { MeshLoader } from '../model/MeshLoader.js';
 import { CombinedCamera } from '../lib/CombinedCamera.js';
-import { resolveLfsUrl } from '../utilities/lfsFetch.js';
 
 /* Render Layer for rendering annotations on the 3D scene */
 export class AnnotationRenderLayer extends RenderLayer {
@@ -105,7 +104,7 @@ export class AnnotationRenderLayer extends RenderLayer {
 				load: path =>
 					new Promise( ( resolve, reject ) => {
 
-						fbxManager.load( resolveLfsUrl( path ), obj => resolve( obj ), onProgress, err => {
+						fbxManager.load( path, obj => resolve( obj ), onProgress, err => {
 
 							console.error( err );
 							reject( err );
