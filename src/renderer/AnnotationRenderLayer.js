@@ -222,7 +222,7 @@ export class AnnotationRenderLayer extends RenderLayer {
 		this.fbxLoader.load( '/models/poi_animated.fbx' ).then( model => {
 
 			this.poiObject = model;
-			this.poiObject.add( new THREE.DirectionalLight( 0xffffff, 0.75 ) );
+			this.poiObject.add( new THREE.DirectionalLight( 0xffffff, 2.25 ) );
 			this.poiMat = this._getMaterial( 1, 1, 1, 1.0 );
 			this.poiMat.uniforms._DrawThroughAlpha.value = 0.25;
 

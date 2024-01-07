@@ -180,8 +180,8 @@ async function init () {
 	const colorLayer = new ModelRenderLayer( model, 0, 'color' );
 	colorLayer.modelToWorld.copy( modelToWorld );
 
-	const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
-	const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	const ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
+	const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 	directionalLight.position.set( 1, 1, 1 );
 	directionalLight.updateMatrixWorld();
 
