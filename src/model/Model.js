@@ -951,7 +951,7 @@ export class Model extends EventDispatcher {
 			//   `${(e.detail.loaded / 1024).toFixed(1)}/${(e.detail.total / 1024).toFixed(1)} KB loaded for ${e.detail.archive}`
 			// );
 			archivesDownloadStatus[ e.detail.archive ] = { loaded: e.detail.loaded, total: e.detail.total };
-			this._dispatch( 'model-binaries-download-progress', { archivesDownloadStatus } );
+			this._dispatch( 'model-binaries-download-progress', { archive: e.detail.archive, archivesDownloadStatus } );
 
 		} );
 

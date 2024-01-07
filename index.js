@@ -52,7 +52,7 @@ let model;
 
 init();
 
-async function init () {
+async function init() {
 
 	let loaded = new Array( 3 ).fill( 0 );
 	let totals = new Array( 3 ).fill( 0 );
@@ -106,8 +106,6 @@ async function init () {
 	model = new Model( hierarchy, metadata, meshStats, urlStem, { maxLod: lod } );
 	const animationPlayer = new AnimationPlayer( model );
 
-	window.model = model;
-
 	// if (model.preprocessDone) {
 	//     writeOutput('');
 	// } else {
@@ -127,6 +125,14 @@ async function init () {
 	model.listen( 'geometry-load-complete', e => {
 
 		writeOutput( '' );
+
+	} );
+	model.listen( 'model-binaries-download-progress', e => {
+
+		const { archive, archivesDownloadStatus } = e.detail;
+		const info = archivesDownloadStatus[ archive ];
+		const perc = info.loaded / info.total;
+		writeOutput( `Downloading model archive... ${ ( perc * 100 ).toFixed( 2 ) }%` );
 
 	} );
 
