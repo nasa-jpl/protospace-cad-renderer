@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import ThreadQueue from 'threading-js/ThreadQueue.js';
 import { EventDispatcher } from './EventDispatcher.js';
 import { JobQueue } from '../utilities/JobQueue.js';
+import { lfsFetch } from '../utilities/lfsFetch.js';
 
 const USE_DITHERED_TRANSPARENCY = true;
 
@@ -714,7 +715,7 @@ export class MeshLoader extends EventDispatcher {
 			const url = ( /[\/]$/.test( this._modelURL ) ? this._modelURL : this._modelURL + '/' ) + archive;
 
 			// fetch the json index for the archive
-			fetch( `${ url }.json`, this._fetchOptions )
+			lfsFetch( `${ url }.json`, this._fetchOptions )
 				.then( res => {
 
 					if ( ! res.ok ) throw new Error( `error fetching model archive index: ${res.status} (${res.statusText})` );
@@ -730,7 +731,7 @@ export class MeshLoader extends EventDispatcher {
 
 			// fetch the binary data for the archive
 			// and dispatch download progress events
-			fetch( `${this._modelURL}/${archive}.bin`, this._fetchOptions )
+			lfsFetch( `${this._modelURL}/${archive}.bin`, this._fetchOptions )
 				.then( res => {
 
 					// Fallback for browsers that have not yet implemented ReadableStream, skip reporting download progress

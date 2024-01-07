@@ -1,4 +1,4 @@
-import { GithubLfsResolver } from "./GithubLfsResolver";
+import { GithubLfsResolver } from './GithubLfsResolver.js';
 
 const resolver = new GithubLfsResolver();
 resolver.pagesStem = location.origin;
