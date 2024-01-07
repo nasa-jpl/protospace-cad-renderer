@@ -10,7 +10,7 @@ Implements techniques for incrementally updating transforms and rendering spacec
 
 1. Run `npm install` in the root folder.
 1. Run `npm start`.
-1. Visit `localhost:9080`.
+1. Visit `localhost:8080`.
 
 ## Credit
 
