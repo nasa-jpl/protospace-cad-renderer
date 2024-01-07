@@ -2,7 +2,7 @@
 
 Self-contained code for rendering extremely high-fidelity processed CAD models originally developed for the [NASA JPL ProtoSpace project](https://www.youtube.com/watch?v=dD0FoH8M1EM) web viewer and companion application.
 
-Implements techniques for incrementally updating transforms and rendering spacecraft parts, interactiving with complex hierarchies of geometries, minimizing visual impact, and compositing layers of rendered components.
+Implements techniques for incrementally updating transforms and rendering spacecraft parts, interacting with complex hierarchies of geometries, minimizing visual impact, and compositing layers of rendered components.
 
 **Warning**: the m2020 model in this repository is over 1.25GB.
 
