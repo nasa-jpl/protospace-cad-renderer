@@ -220,7 +220,7 @@ export class AnnotationRenderLayer extends RenderLayer {
 
 	_loadPoiModel() {
 
-		this.fbxLoader.load( '/models/poi_animated.fbx' ).then( model => {
+		this.fbxLoader.load( './models/poi_animated.fbx' ).then( model => {
 
 			this.poiObject = model;
 			this.poiObject.add( new THREE.DirectionalLight( 0xffffff, 2.25 ) );

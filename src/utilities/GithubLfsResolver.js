@@ -27,7 +27,7 @@ export class GithubLfsResolver {
 
 		if ( ! this.matchesPageStem( url ) ) {
 
-			return url;
+			return url.toString();
 
 		}
 
