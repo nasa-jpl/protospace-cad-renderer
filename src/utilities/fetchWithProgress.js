@@ -1,6 +1,8 @@
+import { lfsFetch } from './lfsFetch.js';
+
 export function fetchWithProgress( url, progressCallback = null ) {
 
-	return fetch( url )
+	return lfsFetch( url )
 		.then( response => {
 
 			if ( response.status === 200 || response.status === 0 ) {
