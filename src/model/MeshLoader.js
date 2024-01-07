@@ -102,7 +102,7 @@ export class MeshLoader extends EventDispatcher {
 				}
 				#endif
 
-				outColor *= mix( vec3( 1, 1, 1 ), color, _VertexColorMultiplier ) / 3.1415926535;
+				outColor *= mix( vec3( 1, 1, 1 ), color, _VertexColorMultiplier );
 
 			}
 		`;
@@ -151,6 +151,8 @@ export class MeshLoader extends EventDispatcher {
 
 				res.rgb += _Emission;
 				gl_FragColor = res;
+
+				#include <colorspace_fragment>
 
 			}
 		`;
@@ -219,9 +221,9 @@ export class MeshLoader extends EventDispatcher {
 		}
 
 		const newMat = this.genericShaderMat.clone();
-		const linearColor = new THREE.Color( color.r, color.g, color.b ).convertSRGBToLinear()
+		const linearColor = new THREE.Color( color.r, color.g, color.b ).convertSRGBToLinear();
 
-		//these properties are added to the material only for the convience of other ProtoSpace code
+		//these properties are added to the material only for the convenience of other ProtoSpace code
 		newMat.color = color;
 		newMat.depthOnly = depthOnly;
 		newMat.ignoreVertexColors = ignoreVertexColors;
