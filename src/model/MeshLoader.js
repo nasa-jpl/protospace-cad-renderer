@@ -102,7 +102,8 @@ export class MeshLoader extends EventDispatcher {
 				}
 				#endif
 
-				outColor *= mix( vec3( 1, 1, 1 ), color, _VertexColorMultiplier );
+				// divide by PI for physically based lighting
+				outColor *= mix( vec3( 1, 1, 1 ), color, _VertexColorMultiplier ) / 3.1415926535;
 
 			}
 		`;
