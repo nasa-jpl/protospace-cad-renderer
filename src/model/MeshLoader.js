@@ -712,10 +712,10 @@ export class MeshLoader extends EventDispatcher {
 			};
 
 			// ensure we're not double-adding slashes
-			const url = ( /[\/]$/.test( this._modelURL ) ? this._modelURL : this._modelURL + '/' ) + archive;
+			const archivePath = ( /[\/]$/.test( this._modelURL ) ? this._modelURL : this._modelURL + '/' ) + archive;
 
 			// fetch the json index for the archive
-			lfsFetch( `${ url }.json`, this._fetchOptions )
+			lfsFetch( `${ archivePath }.json`, this._fetchOptions )
 				.then( res => {
 
 					if ( ! res.ok ) throw new Error( `error fetching model archive index: ${res.status} (${res.statusText})` );
@@ -731,7 +731,7 @@ export class MeshLoader extends EventDispatcher {
 
 			// fetch the binary data for the archive
 			// and dispatch download progress events
-			lfsFetch( `${this._modelURL}/${archive}.bin`, this._fetchOptions )
+			lfsFetch( `${ archivePath }.bin`, this._fetchOptions )
 				.then( res => {
 
 					// Fallback for browsers that have not yet implemented ReadableStream, skip reporting download progress
