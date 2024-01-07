@@ -3,8 +3,8 @@ export class GithubLfsResolver {
 	constructor() {
 
 		this.pagesStem = '';
-		this.targetStem = '';
-		this.targetBranch = '';
+		this.targetStem = 'https://media.githubusercontent.com/media';
+		this.targetBranch = 'main';
 
 	}
 
@@ -34,7 +34,7 @@ export class GithubLfsResolver {
 		const tokens = remainder.split( /[\/]/g );
 		const githubOrg = tokens.shift();
 		const githubRepo = tokens.shift();
-		return `${ targetStem }/${ githubOrg }/${ githubRepo }/blob/${ targetBranch }/${ tokens.join( '/' ) }?raw=true`;
+		return `${ targetStem }/${ githubOrg }/${ githubRepo }/${ targetBranch }/${ tokens.join( '/' ) }`;
 
 	}
 

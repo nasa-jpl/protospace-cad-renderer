@@ -2,8 +2,6 @@ import { GithubLfsResolver } from './GithubLfsResolver.js';
 
 const resolver = new GithubLfsResolver();
 resolver.pagesStem = location.origin;
-resolver.targetBranch = 'main';
-resolver.targetStem = `${ location.protocol }//raw.githubusercontent.com`;
 
 export function lfsFetch( url, options ) {
 
