@@ -391,4 +391,15 @@ async function init() {
 
 	} );
 
+	// removing until orbit controls does not broadcast change every frame
+	// gui.add( { camera: 'perspective' }, 'camera', [ 'perspective', 'orthographic' ] ).onChange( v => {
+
+	// 	if ( v === 'perspective' ) colorLayer.camera.toPerspective();
+	// 	if ( v === 'orthographic' ) colorLayer.camera.toOrthographic();
+
+	// 	colorLayer.redraw();
+	// 	highlightLayer.redraw();
+
+	// } );
+
 }

@@ -61,63 +61,43 @@ CombinedCamera.prototype.toPerspective = function() {
   this.isOrthographicCamera = false;
 };
 
-//CombinedCamera.prototype.toOrthographic = function () {
-//
-//	// Switches to the Orthographic camera estimating viewport from Perspective
-//
-//	var fov = this.fov;
-//	var aspect = this.cameraP.aspect;
-//	var near = this.cameraP.near;
-//	var far = this.cameraP.far;
-//
-//	// The size that we set is the mid plane of the viewing frustum
-//
-//	var hyperfocus = ( near + far ) / 2;
-//
-//	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
-//	var halfWidth = halfHeight * aspect;
-//
-//	halfHeight /= this.zoom;
-//	halfWidth /= this.zoom;
-//
-//	this.cameraO.left = - halfWidth;
-//	this.cameraO.right = halfWidth;
-//	this.cameraO.top = halfHeight;
-//	this.cameraO.bottom = - halfHeight;
-//	this.cameraO.view = this.view;
-//
-//	this.cameraO.updateProjectionMatrix();
-//
-//	this.near = this.cameraO.near;
-//	this.far = this.cameraO.far;
-//	this.projectionMatrix = this.cameraO.projectionMatrix;
-//
-//	this.inPerspectiveMode = false;
-//	this.inOrthographicMode = true;
-//
-//};
-CombinedCamera.prototype.toOrthographic = function() {
-  // Switches to the Orthographic camera
+CombinedCamera.prototype.toOrthographic = function () {
 
-  this.cameraO.near = this.near;
-  this.cameraO.far = this.far;
+	// Switches to the Orthographic camera estimating viewport from Perspective
 
-  this.cameraO.zoom = this.zoom;
+	var fov = this.fov;
+	var aspect = this.cameraP.aspect;
+	var near = this.cameraP.near;
+	var far = this.cameraP.far;
 
-  this.cameraO.left = this.left;
-  this.cameraO.right = this.right;
-  this.cameraO.top = this.top;
-  this.cameraO.bottom = this.bottom;
+	// The size that we set is the mid plane of the viewing frustum
 
-  this.cameraO.view = this.view;
+	var hyperfocus = this.position.length() ;//( near + far ) / 2;
 
-  this.cameraO.updateProjectionMatrix();
+	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
+	var halfWidth = halfHeight * aspect;
 
-  this.projectionMatrix = this.cameraO.projectionMatrix;
-  this.projectionMatrixInverse = this.cameraO.projectionMatrixInverse;
+	halfHeight /= this.zoom;
+	halfWidth /= this.zoom;
 
-  this.isPerspectiveCamera = false;
-  this.isOrthographicCamera = true;
+	this.cameraO.left = - halfWidth;
+	this.cameraO.right = halfWidth;
+	this.cameraO.top = halfHeight;
+	this.cameraO.bottom = - halfHeight;
+	this.cameraO.near = near;
+	this.cameraO.far = far;
+	this.cameraO.view = this.view;
+
+	this.cameraO.updateProjectionMatrix();
+
+	this.near = this.cameraO.near;
+	this.far = this.cameraO.far;
+	this.projectionMatrix = this.cameraO.projectionMatrix;
+	this.projectionMatrixInverse = this.cameraO.projectionMatrixInverse;
+
+	this.isPerspectiveCamera = false;
+	this.isOrthographicCamera = true;
+
 };
 
 CombinedCamera.prototype.copy = function(source) {

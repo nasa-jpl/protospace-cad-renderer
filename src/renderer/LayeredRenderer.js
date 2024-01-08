@@ -12,6 +12,7 @@ class BufferLayer {
 			this._target = new THREE.WebGLRenderTarget( 1, 1, {
 				minFilter: THREE.LinearFilter,
 				magFilter: THREE.NearestFilter,
+				colorSpace: THREE.SRGBColorSpace,
 			} );
 
 		}
@@ -70,6 +71,7 @@ export class LayeredRenderer {
 
 		this._scene = new THREE.Scene();
 		this._renderer = new THREE.WebGLRenderer();
+		this._renderer.toneMapping = THREE.AgXToneMapping;
 		this._renderer.setPixelRatio( window.devicePixelRatio );
 		this._camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 1000 );
 		this._layers = [];
