@@ -156,6 +156,11 @@ export class LayeredRenderer {
 		// scale the renderer based on the AA and the DPI of the screen
 		const canvasWidth = this.domElement.offsetWidth;
 		const canvasHeight = this.domElement.offsetHeight;
+		if ( canvasHeight === 0 || canvasWidth === 0 ) {
+
+			return;
+
+		}
 
 		// the widths and heights of the target account
 		// for anti aliasing
