@@ -138,7 +138,7 @@ async function init() {
 
 
 	// create the renderer
-	const backgroundColor = new THREE.Color( 0x151515 ).convertSRGBToLinear();
+	const backgroundColor = new THREE.Color( 0x1d2123 );
 	const renderer = new LayeredRenderer( backgroundColor );
 	const element = renderer.domElement;
 	renderer.prerender = function ( width, height ) {
@@ -186,9 +186,9 @@ async function init() {
 	const colorLayer = new ModelRenderLayer( model, 0, 'color' );
 	colorLayer.modelToWorld.copy( modelToWorld );
 
-	const ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
-	const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
-	directionalLight.position.set( 1, 1, 1 );
+	const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+	const directionalLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+	directionalLight.position.set( 1, 3, 2 );
 	directionalLight.updateMatrixWorld();
 
 	const controls = new OrbitControls( colorLayer.camera, element );
@@ -276,8 +276,8 @@ async function init() {
 
 	model.listen( 'preprocess-complete', () => setSelectionMap( selectedMap ) );
 
-	const lightMat = new THREE.MeshBasicMaterial( { wireframe: true, color: 'rgb(65%, 75%, 70%)', opacity: 0.1, transparent: true, depthTest: false } );
-	const highlightMat = new THREE.MeshBasicMaterial( { wireframe: true, color: 'rgb(0%, 100%, 50%)', opacity: 0.1, transparent: true, depthTest: false } );
+	const lightMat = new THREE.MeshBasicMaterial( { color: 'rgb(65%, 75%, 70%)', opacity: 0.35, transparent: true, depthTest: false } );
+	const highlightMat = new THREE.MeshBasicMaterial( { color: 'rgb(0%, 100%, 50%)', opacity: 0.35, transparent: true, depthTest: false } );
 	highlightLayer.getMaterial = n => ( ! n.cached.enabledInTree || ! n.cached.visibleInTree ? lightMat : highlightMat );
 	highlightLayer.getNodeToRender = ( model, i ) => getSelectedNode( i );
 	highlightLayer.isVisible = () => {
