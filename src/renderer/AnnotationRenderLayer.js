@@ -61,15 +61,13 @@ export class AnnotationRenderLayer extends RenderLayer {
 
 			uniform bool _UseOptionalTexture;
 			uniform sampler2D _OptionalTexture;
-			uniform int _DepthTexWidth;
-			uniform int _DepthTexHeight;
 
 			${MeshLoader.shaderFunctions.isDithered}
 
 			void main(void)
 			{
-				float widthFraction = gl_FragCoord.x / float(_DepthTexWidth);
-				float heightFraction = gl_FragCoord.y / float(_DepthTexHeight);
+				float widthFraction = gl_FragCoord.x / float(textureSize(_DepthTexture, 0).x);
+				float heightFraction = gl_FragCoord.y / float(textureSize(_DepthTexture, 0).y);
 
 				float unscaledColorLayerDepth = texture2D(_DepthTexture, vec2(widthFraction, heightFraction)).x;
 				if (gl_FragCoord.z > unscaledColorLayerDepth) {
@@ -131,8 +129,6 @@ export class AnnotationRenderLayer extends RenderLayer {
 					{
 						_Color: { type: 'v4', value: new THREE.Vector4( 0.0, 0.0, 0.0, 0.0 ) },
 						_DepthTexture: { value: new THREE.DepthTexture() },
-						_DepthTexWidth: { type: 'i', value: 0 },
-						_DepthTexHeight: { type: 'i', value: 0 },
 						_DrawThroughAlpha: { type: 'f', value: 0.0 },
 					},
 				] ),
@@ -192,6 +188,7 @@ export class AnnotationRenderLayer extends RenderLayer {
 		// load models
 		this.poiScale = 0.01;
 		this._loadPoiModel();
+		this._loadGrid();
 		this.animationClock = new THREE.Clock();
 
 	}
@@ -214,6 +211,58 @@ export class AnnotationRenderLayer extends RenderLayer {
 		newMat.uniforms._Color.value = new THREE.Vector4( r, g, b, a );
 
 		return newMat;
+
+	}
+
+	_loadGrid() {
+
+		const helper = new THREE.GridHelper( 5, 10, 0xffffff, 0xffffff );
+		helper.material.onBeforeCompile = params => {
+
+			params.uniforms = {
+				...params.uniforms,
+				_DepthTexture: { value: null }
+			};
+
+			params.fragmentShader = params
+				.fragmentShader
+				.replace(
+					'#include <common>',
+					match => /* glsl */`
+
+						uniform sampler2D _DepthTexture;
+
+						${ match }
+					`
+				)
+				.replace(
+					'#include <clipping_planes_fragment>',
+					match => /* glsl */`
+
+						float widthFraction = gl_FragCoord.x / float(textureSize(_DepthTexture, 0).x);
+						float heightFraction = gl_FragCoord.y / float(textureSize(_DepthTexture, 0).y);
+
+						float unscaledColorLayerDepth = texture2D(_DepthTexture, vec2(widthFraction, heightFraction)).x;
+						if (gl_FragCoord.z > unscaledColorLayerDepth) {
+							discard;
+						}
+
+						${ match }
+					`
+				);
+
+			helper.material.uniforms = params.uniforms;
+
+		};
+
+		helper.material.transparent = true;
+		helper.material.opacity = 0.25;
+
+		// NOTE: This is a height value selected for m2020
+		helper.position.y = - 1.12;
+
+		this.gridHelper = helper;
+		this.scene.add( helper );
 
 	}
 
@@ -315,13 +364,16 @@ export class AnnotationRenderLayer extends RenderLayer {
 		// Material Updates
 		const updateMaterial = mat => {
 
-			mat.uniforms._DepthTexture.value = this.depthTexture;
-			mat.uniforms._DepthTexWidth.value = this.depthTexture.image.width;
-			mat.uniforms._DepthTexHeight.value = this.depthTexture.image.height;
+			if ( mat.uniforms ) {
+
+				mat.uniforms._DepthTexture.value = this.depthTexture;
+
+			}
 
 		};
 
 		if ( this.poiMat ) updateMaterial( this.poiMat );
+		if ( this.gridHelper ) updateMaterial( this.gridHelper.material );
 
 		this.prerender( renderer, target, viewWidth, viewHeight );
 
