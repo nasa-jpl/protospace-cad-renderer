@@ -1,5 +1,7 @@
 # protospace-cad-renderer
 
+![protospace-cad-rendeer](./images/banner.png)
+
 Self-contained code for rendering extremely high-fidelity processed CAD models originally developed for the [NASA JPL ProtoSpace project](https://www.youtube.com/watch?v=dD0FoH8M1EM) web viewer and companion application.
 
 Implements techniques for incrementally updating transforms and rendering spacecraft parts, interacting with complex hierarchies of geometries, minimizing visual impact, and compositing layers of rendered components.
