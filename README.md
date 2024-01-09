@@ -21,3 +21,9 @@ Renderer and interaction implementation credit to Garrett Johnson, Marsette Vona
 ## License
 
 Copyright 2022, by the California Institute of Technology. ALL RIGHTS RESERVED. United States Government Sponsorship acknowledged.
+
+## Dependencies
+
+- [three.js](https://github.com/mrdoob/three.js/), MIT Licensed
+- [inflate.js](https://github.com/imaya/zlib.js), MIT Licensed
+- [lzf.js](https://github.com/McSimp/lzfjs/), BSD-2-Clause Licensed
