@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './src/lib/OrbitControls.js';
 import { LayeredRenderer } from './src/renderer/LayeredRenderer.js';
 import { ModelRenderLayer } from './src/renderer/ModelRenderLayer.js';
 import { ModelCaster } from './src/renderer/ModelCaster.js';
@@ -208,7 +208,7 @@ async function init() {
 	colorLayer.depthTexture.type = THREE.UnsignedIntType;
 	colorLayer.triangleLimit = 1500000;
 	colorLayer.geometryLimit = 1500;
-	colorLayer.camera.position.set( 2, 2, 2 );
+	colorLayer.camera.position.set( 2.5, 0.75, 1.9 );
 
 	// colorLayer.clipPlane = this.clipPlane;
 
@@ -392,14 +392,14 @@ async function init() {
 	} );
 
 	// removing until orbit controls does not broadcast change every frame
-	// gui.add( { camera: 'perspective' }, 'camera', [ 'perspective', 'orthographic' ] ).onChange( v => {
+	gui.add( { camera: 'perspective' }, 'camera', [ 'perspective', 'orthographic' ] ).onChange( v => {
 
-	// 	if ( v === 'perspective' ) colorLayer.camera.toPerspective();
-	// 	if ( v === 'orthographic' ) colorLayer.camera.toOrthographic();
+		if ( v === 'perspective' ) colorLayer.camera.toPerspective();
+		if ( v === 'orthographic' ) colorLayer.camera.toOrthographic();
 
-	// 	colorLayer.redraw();
-	// 	highlightLayer.redraw();
+		colorLayer.redraw();
+		highlightLayer.redraw();
 
-	// } );
+	} );
 
 }

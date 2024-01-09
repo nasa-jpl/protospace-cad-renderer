@@ -148,9 +148,8 @@ export class MeshLoader extends EventDispatcher {
 
 				}
 
-				vec4 res = _Color;
+				vec4 res = vec4( _Color.rgb, 1.0 );
 				res.rgb *= outColor;
-
 				res.rgb += _Emission;
 				gl_FragColor = res;
 
