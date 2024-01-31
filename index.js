@@ -49,6 +49,8 @@ const hierarchyUrl = urlStem + 'hierarchy.json';
 const metadataUrl = urlStem + 'metadata.json';
 const meshStatsUrl = urlStem + 'mesh_stats.json';
 let model;
+let numFramesRendering = 0;
+let numFramesForLastRender = 0;
 
 init();
 
@@ -150,10 +152,14 @@ async function init() {
 			if ( colorRendering || highlightRendering ) {
 
 				writeOutput( 'rendering...' );
+				
+				numFramesRendering++;
+				numFramesForLastRender = numFramesRendering;
 
 			} else {
 
-				writeOutput( '' );
+				writeOutput( 'Full rendering took ' + numFramesForLastRender + ' frames (since last camera movement)' );
+				numFramesRendering = 0;
 
 			}
 
@@ -199,6 +205,8 @@ async function init() {
 
 		colorLayer.redraw();
 		highlightLayer.redraw();
+
+		numFramesRendering = 0;
 
 	} );
 
