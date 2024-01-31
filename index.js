@@ -175,7 +175,7 @@ async function init() {
 
 			colorLayer.redraw();
 			highlightLayer.redraw();
-			
+
 		}
 
 	};
