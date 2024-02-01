@@ -158,7 +158,7 @@ async function init() {
 
 			} else {
 
-				writeOutput( 'Full rendering took ' + numFramesForLastRender + ' frames (since last camera movement)' );
+				writeOutput( 'Finished in ' + numFramesForLastRender + ' frames' );
 				numFramesRendering = 0;
 
 			}
