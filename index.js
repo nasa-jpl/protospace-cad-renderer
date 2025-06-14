@@ -399,6 +399,86 @@ async function init() {
 
 	} );
 
+	// Add clip plane controls
+	const clipPlaneFolder = gui.addFolder( 'Clip Plane' );
+	
+	// Create clip plane configuration object
+	const clipPlaneConfig = {
+		enabled: false,
+		point: new THREE.Vector3(0, 0, 0),
+		normal: new THREE.Vector3(1, 0, 0)
+	};
+	
+	// Function to update the clip plane state
+	function updateClipPlaneState() {
+		if (clipPlaneConfig.enabled) {
+			// Create a normalized copy of the normal vector
+			const normalizedNormal = clipPlaneConfig.normal.clone().normalize();
+			
+			// When enabled, set the clip plane on both layers
+			colorLayer.clipPlane = {
+				point: clipPlaneConfig.point,
+				normal: normalizedNormal
+			};
+			highlightLayer.clipPlane = colorLayer.clipPlane;
+		} else {
+			// When disabled, set to null to disable clipping
+			colorLayer.clipPlane = null;
+			highlightLayer.clipPlane = null;
+		}
+		colorLayer.redraw();
+		highlightLayer.redraw();
+	}
+	
+	// Enable/disable clip plane
+	clipPlaneFolder.add(clipPlaneConfig, 'enabled').name('Enable Clip Plane').onChange(updateClipPlaneState);
+	
+	// Clip plane position controls
+	const positionFolder = clipPlaneFolder.addFolder('Position');
+	positionFolder.add(clipPlaneConfig.point, 'x', -10, 10, 0.1).name('X').onChange(updateClipPlaneState);
+	positionFolder.add(clipPlaneConfig.point, 'y', -10, 10, 0.1).name('Y').onChange(updateClipPlaneState);
+	positionFolder.add(clipPlaneConfig.point, 'z', -10, 10, 0.1).name('Z').onChange(updateClipPlaneState);
+	
+	// Clip plane normal controls
+	const normalFolder = clipPlaneFolder.addFolder('Normal');
+	normalFolder.add(clipPlaneConfig.normal, 'x', -1, 1, 0.1).name('X').onChange(updateClipPlaneState);
+	normalFolder.add(clipPlaneConfig.normal, 'y', -1, 1, 0.1).name('Y').onChange(updateClipPlaneState);
+	normalFolder.add(clipPlaneConfig.normal, 'z', -1, 1, 0.1).name('Z').onChange(updateClipPlaneState);
+	
+	// Add preset clip plane orientations
+	const presetFolder = clipPlaneFolder.addFolder('Presets');
+	const presets = {
+		'X Axis': function() {
+			clipPlaneConfig.normal.set(1, 0, 0);
+			updateClipPlaneControls();
+		},
+		'Y Axis': function() {
+			clipPlaneConfig.normal.set(0, 1, 0);
+			updateClipPlaneControls();
+		},
+		'Z Axis': function() {
+			clipPlaneConfig.normal.set(0, 0, 1);
+			updateClipPlaneControls();
+		}
+	};
+	
+	// Function to update controls after preset is selected
+	function updateClipPlaneControls() {
+		// Update the GUI controls to reflect the new values
+		for (const controller of normalFolder.controllers) {
+			controller.updateDisplay();
+		}
+		updateClipPlaneState();
+	}
+	
+	// Add preset buttons
+	for (const [name, func] of Object.entries(presets)) {
+		presetFolder.add({ [name]: func }, name);
+	}
+	
+	// Initialize clip plane state
+	updateClipPlaneState();
+
 	// removing until orbit controls does not broadcast change every frame
 	gui.add( { camera: 'perspective' }, 'camera', [ 'perspective', 'orthographic' ] ).onChange( v => {
 
