@@ -7,6 +7,7 @@ import { Model } from './src/model/Model.js';
 import { AnimationPlayer } from './src/model/AnimationPlayer.js';
 import { AnnotationRenderLayer } from './src/renderer/AnnotationRenderLayer.js';
 import { fetchWithProgress } from './src/utilities/fetchWithProgress.js';
+import { ClipPlaneUtilities } from './src/utilities/ClipPlaneUtilities.js';
 import GUI from 'three/addons/libs/lil-gui.module.min.js';
 
 function numberWithCommas( x ) {
@@ -284,8 +285,9 @@ async function init() {
 
 	model.listen( 'preprocess-complete', () => setSelectionMap( selectedMap ) );
 
-	const lightMat = new THREE.MeshBasicMaterial( { color: 'rgb(65%, 75%, 70%)', opacity: 0.35, transparent: true, depthTest: false } );
-	const highlightMat = new THREE.MeshBasicMaterial( { color: 'rgb(0%, 100%, 50%)', opacity: 0.35, transparent: true, depthTest: false } );
+	// Create custom shader materials for highlighting that support clipping planes
+	const lightMat = ClipPlaneUtilities.createHighlightMaterial( { r: 0.65, g: 0.75, b: 0.70 }, 0.35 );
+	const highlightMat = ClipPlaneUtilities.createHighlightMaterial( { r: 0.0, g: 1.0, b: 0.5 }, 0.35 );
 	highlightLayer.getMaterial = n => ( ! n.cached.enabledInTree || ! n.cached.visibleInTree ? lightMat : highlightMat );
 	highlightLayer.getNodeToRender = ( model, i ) => getSelectedNode( i );
 	highlightLayer.isVisible = () => {

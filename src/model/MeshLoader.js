@@ -2,6 +2,7 @@ import '../lib/lzf.js';
 import * as THREE from 'three';
 import ThreadQueue from 'threading-js/ThreadQueue.js';
 import { EventDispatcher } from './EventDispatcher.js';
+import { ClipPlaneUtilities } from '../utilities/ClipPlaneUtilities.js';
 import { JobQueue } from '../utilities/JobQueue.js';
 import { lfsFetch } from '../utilities/lfsFetch.js';
 
@@ -122,9 +123,7 @@ export class MeshLoader extends EventDispatcher {
 			uniform vec4 _Color;
 			uniform vec3 _Emission;
 			uniform bool PS_M_DITHER_TRANSPARENCY;
-			uniform bool PS_M_CLIP;
-			uniform vec3 _PSClipPlanePosition;
-			uniform vec3 _PSClipPlaneNormal;
+			${ClipPlaneUtilities.getClipPlaneUniformDeclarations()}
 
 			${ this.shaderFunctions.isDithered }
 
@@ -136,17 +135,7 @@ export class MeshLoader extends EventDispatcher {
 
 				}
 
-				// Discard if on the wrong side of the cut plane
-				if ( PS_M_CLIP ) {
-
-					vec3 planePointToWorldPos = worldPos.xyz - _PSClipPlanePosition;
-					if ( dot( normalize( planePointToWorldPos ), normalize( _PSClipPlaneNormal ) ) < 0.0 ) {
-
-						discard;
-
-					}
-
-				}
+				${ClipPlaneUtilities.getClipPlaneFragmentShader()}
 
 				vec4 res = vec4( _Color.rgb, 1.0 );
 				res.rgb *= outColor;
@@ -204,12 +193,10 @@ export class MeshLoader extends EventDispatcher {
 				uniforms: THREE.UniformsUtils.merge( [
 					THREE.UniformsLib.lights,
 					{
-						PS_M_CLIP: { value: false },
+						...ClipPlaneUtilities.getClipPlaneUniforms(),
 						PS_M_DITHER_TRANSPARENCY: { value: false },
 						_Color: { value: new THREE.Vector4( 0.0, 0.0, 0.0, 0.0 ) },
 						_Emission: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
-						_PSClipPlanePosition: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
-						_PSClipPlaneNormal: { value: new THREE.Vector3( 0.0, 0.0, 0.0 ) },
 						_NormalDirection: { value: 1 },
 						_VertexColorMultiplier: { value: 1 },
 					},
@@ -241,8 +228,6 @@ export class MeshLoader extends EventDispatcher {
 		newMat.uniforms._Color.value = new THREE.Vector4( linearColor.r, linearColor.g, linearColor.b, color.a );
 
 		newMat.uniforms.PS_M_DITHER_TRANSPARENCY.value = USE_DITHERED_TRANSPARENCY && newMat.useAlpha;
-		newMat.uniforms._PSClipPlanePosition.value = new THREE.Vector3( 0.0, 0.0, 0.0 );
-		newMat.uniforms._PSClipPlaneNormal.value = new THREE.Vector3( 0.0, 1.0, 0.0 );
 		newMat.uniforms._VertexColorMultiplier.value = ignoreVertexColors ? 0 : 1;
 
 		newMat.uniforms._NormalDirection.value = side === THREE.BackSide ? - 1 : 1;
