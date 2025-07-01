@@ -166,10 +166,8 @@ async function init() {
 
 		}
 
-		// TODO: do this in a resize event
-		colorLayer.camera.setSize( width, height );
+		// Camera size is now handled by window resize event
 		colorLayer.camera.updateMatrixWorld( true );
-		colorLayer.camera.updateProjectionMatrix();
 		controls.update();
 
 		if ( model && ! model.geometryLoaded ) {
@@ -209,6 +207,19 @@ async function init() {
 
 		numFramesRendering = 0;
 
+	} );
+
+	// Add window resize event listener
+	window.addEventListener( 'resize', () => {
+		// Update camera size when window resizes
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		colorLayer.camera.setSize( width, height );
+		
+		// Force redraw after resize
+		colorLayer.redraw();
+		highlightLayer.redraw();
+		numFramesRendering = 0;
 	} );
 
 	colorLayer.scene.add( ambientLight );

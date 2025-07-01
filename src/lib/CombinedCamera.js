@@ -153,11 +153,25 @@ CombinedCamera.prototype.clearViewOffset = function() {
 };
 
 CombinedCamera.prototype.setSize = function(width, height) {
-  this.aspect = width / height; //this.cameraP.aspect = width / height;
+  this.aspect = width / height;
   this.left = -width / 2;
   this.right = width / 2;
   this.top = height / 2;
   this.bottom = -height / 2;
+  
+  // update aspect here so that toOrthographic() works correctly
+  this.cameraP.aspect = this.aspect;
+
+  if (this.isOrthographicCamera) {
+    // For orthographic mode, we need to recalculate the bounds
+    // based on the current view frustum
+    this.toOrthographic();
+  } else {
+    // For perspective mode, just update the aspect and matrix
+    this.cameraP.updateProjectionMatrix();
+    this.projectionMatrix = this.cameraP.projectionMatrix;
+    this.projectionMatrixInverse = this.cameraP.projectionMatrixInverse;
+  }
 };
 
 CombinedCamera.prototype.setFov = function(fov) {
